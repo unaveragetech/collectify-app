@@ -3,6 +3,18 @@
   "site": "https://unaveragetech.github.io/collectify-app/",
   "releases": [
     {
+      "version": "0.17.4",
+      "versionCode": 24,
+      "tag": "v0.17.4-standalone",
+      "date": "2026-10-05T22:51:41Z",
+      "apk": "Collectify-v0.17.4.apk",
+      "size": 92820008,
+      "sha256": "cebd9048f9c0589be77b53abb2257123ab1f998431252ee67222419dd4c1f2cc",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.17.4-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.17.4-standalone/Collectify-v0.17.4.apk",
+      "notes": "## Collectify 0.17.4\n\nInstalls over your existing Collectify; your data is kept.\n\n### Pick packs: no more disappearing packs or redraws\n- **Cause:** the 0.17.3 performance pass had set long lists to \"paint only what's on screen\" and to lazy-load thumbnails, which makes Android's WebView leave blank rows and re-draw them while you scroll. On top of that, the whole list was being rebuilt every time you claimed a pack or loaded more.\n- **Fix:** those two settings are removed. The list now keeps its rows: *Load more* only adds the new rows at the bottom, and claiming a pack just updates the buttons in place, so your scroll position never jumps and nothing flickers. Thumbnails have a fixed size so rows don't shift as they load, and the per-row shadows, press animations and transitions that caused extra redraws are gone.\n- The same blank-row risk is removed from the shop, trade and binder-search lists.\n\nTested by scrolling the list on an Android emulator and in a desktop browser, not on a physical phone.\n"
+    },
+    {
       "version": "0.17.3",
       "versionCode": 23,
       "tag": "v0.17.3-standalone",
