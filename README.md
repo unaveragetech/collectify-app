@@ -1,5 +1,7 @@
 # Collectify (Android)
 
+**Website:** https://unaveragetech.github.io/collectify-app/ - what the app does, its goals and approach, and the SHA-256 of every release. In the app, ℹ️ → *Check for updates* compares your install with that list.
+
 Sideloadable builds of the Collectify Android app: a WebView shell around the
 [Collectify](https://github.com/unaveragetech/collectify) web app - card
 scanning/OCR, binders, grading, in-person trading, wishlist, and price tracking
@@ -36,3 +38,7 @@ and download again if they differ.
   uninstall it first. Uninstalling removes local data.
 - Releases up to v0.11.0 shipped as `app-debug.apk` (debug builds, 170+ MB).
   Use the newest release instead.
+
+## Publishing a release (maintainers)
+
+After `gh release create`, run `python tools/build_site.py`, then commit and push `docs/` so the website and the in-app update check see the new version and its checksum.
