@@ -3,6 +3,18 @@
   "site": "https://unaveragetech.github.io/collectify-app/",
   "releases": [
     {
+      "version": "0.17.2",
+      "versionCode": 22,
+      "tag": "v0.17.2-standalone",
+      "date": "2026-10-05T22:34:47Z",
+      "apk": "Collectify-v0.17.2.apk",
+      "size": 92815937,
+      "sha256": "49ff678777be8c381185685e7380b02e27cc8cc16a27427bd6d6bd46de0cd0b2",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.17.2-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.17.2-standalone/Collectify-v0.17.2.apk",
+      "notes": "## Collectify 0.17.2\n\nInstalls over your existing Collectify; your data is kept.\n\n### A proper holographic shimmer\nThe card shader from 0.17.1 was too washed out. It has been rebuilt around how real foil cards look:\n\n- **Rainbow holo with diffraction.** Holo cards get vivid, saturated rainbow bands plus fine diffraction lines, blended so the picture keeps its contrast (no more milky haze). The colours sweep across as you tilt, and the foil is strongest in the art window.\n- **Three distinct foils.** *Holo* is a diagonal rainbow; *ultra* rares are warm gold-foil sunpillars; *secret* rares are a violet/blue cosmic nebula with a field of twinkling stars.\n- **Sheen and glitter.** A bright streak sweeps across the card following your finger, tiny glitter stars flash as their angle comes round, and a soft glare and rim light track the touch.\n- **Finger held = more of everything:** deeper parallax, stronger foil, brighter sparkles, easing back on release. Ultra and secret rares shimmer by themselves.\n- Rarer cards also tint the pack-opening backdrop. Rendering resolution is capped so it stays smooth on phones.\n\nTested on an Android emulator and a desktop browser, not on a physical phone.\n"
+    },
+    {
       "version": "0.17.1",
       "versionCode": 21,
       "tag": "v0.17.1-standalone",
