@@ -1,0 +1,114 @@
+{
+  "app": "Collectify",
+  "site": "https://unaveragetech.github.io/collectify-app/",
+  "releases": [
+    {
+      "version": "0.17.0",
+      "versionCode": 20,
+      "tag": "v0.17.0-standalone",
+      "date": "2026-10-05T21:46:04Z",
+      "apk": "Collectify-v0.17.0.apk",
+      "size": 92807968,
+      "sha256": "1ef39315dbbd1689118a0a5dd523067af7bbc2d03ac8c58a5dafc07f1f0aa329",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.17.0-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.17.0-standalone/Collectify-v0.17.0.apk",
+      "notes": "## Collectify 0.17.0\n\nInstalls over your existing Collectify; your data is kept.\n\n### Updates and the project site\n- **Check for updates.** The ℹ️ About sheet now has an **Updates** section. *Check for updates* compares your installed version with the published release list; if there's a newer one, *Releases page* opens GitHub in your browser so you can download and install it over the app.\n- **Checksum check.** On Android the app also computes the SHA-256 of its own installed APK and compares it with the checksum published for that version, so you can see whether your install matches the official file. (It only applies to an install made from the release file.)\n- **Website.** Collectify now has a GitHub Pages site explaining the app, its goals and approach, with every release's SHA-256 listed: https://unaveragetech.github.io/collectify-app/\n\nTested on an Android emulator and a desktop browser, not on a physical phone.\n"
+    },
+    {
+      "version": "0.16.0",
+      "versionCode": 19,
+      "tag": "v0.16.0-standalone",
+      "date": "2026-10-05T21:36:50Z",
+      "apk": "Collectify-v0.16.0.apk",
+      "size": 92805324,
+      "sha256": "a89d7261972f0dde5702392b8822d1ed54cca1c990d294ab19565f81a0164d98",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.16.0-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.16.0-standalone/Collectify-v0.16.0.apk",
+      "notes": "## Collectify 0.16.0\n\nInstalls over your existing Collectify; your data is kept.\n\n### Treasure Box\n- **Foil packs, sliced open.** Packs now have a crinkled metallic foil wrapper with ridged crimped seals. Swipe a finger across the top (either direction): a glowing blade follows your finger with sparks, light leaks out of the slit, and the top peels away.\n- **3D, \"pop\" cards.** Revealed cards tilt in 3D under your finger and the artwork lifts off the frame with a shadow and parallax. Rare cards shimmer, and ultra/secret rares are animated on their own. Hold your finger on a card to make the foil, sparkles and art come alive.\n- **Hourly pack tokens.** Mint one token an hour; spend tokens in \"Pick packs\" to buy a pack instantly (boxes still have to be mined).\n- **Who's that Pokémon?** A new silhouette challenge every hour (Pokédex gen 1-3, bundled offline). A correct answer pays coins; get one right every hour and the multiplier grows from x1 up to x4. One missed hour is forgiven; a wrong answer resets the streak.\n- **Shop.** Buy sleeves (packs of 10), binder cover styles and sticker sets with game coins.\n\n### Binders\n- **Customize covers.** Pick a cover style (leather, galaxy, gold foil, holo...), feature cards from the binder, and place stickers (including 151 Pokédex sprites). Drag, resize and rotate everything. Covers show on your shelf.\n- **Sleeves.** Sleeve any card from the card viewer (🛡 Sleeve). Sleeved cards get a coloured edge and sheen in the binder and viewer, and a matching card back.\n\n### Trade\n- **Digital cards can be traded.** Treasure Box cards can be offered, clearly marked 🎲 DIGITAL with a note that they have no physical equivalent: nothing is handed over in person for them, they move between binders in the app, and they are left out of the market-value totals. Physical cards are labelled \"exchanged in person\".\n\n### Look and feel\n- Frosted-glass header and tab bar, spring-in sheets, glossier buttons, glass cards and screen transitions.\n\nNotes: tested on an Android emulator and a desktop browser, not on a physical phone. Offline two-code trading is still physical-only.\n"
+    },
+    {
+      "version": "0.15.1",
+      "versionCode": 18,
+      "tag": "v0.15.1-standalone",
+      "date": "2026-10-05T20:00:45Z",
+      "apk": "Collectify-v0.15.1.apk",
+      "size": 92398901,
+      "sha256": "c05e30baee076df9441bfb0c97b14fc4497bf53e3549ad8c99e5d58cb12a1e41",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.15.1-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.15.1-standalone/Collectify-v0.15.1.apk",
+      "notes": "## Collectify 0.15.1\n\nInstalls over your existing Collectify; your data is kept.\n\n### Treasure Box\n- **Boxes are now a real grind.** A box is one *hardened* block for every pack inside it (12), mined one after another. Each block you break gives you one pack to rip, so a box no longer pays out all its packs for a single block. Products with no market price are valued sensibly (a box is worth a box of packs), so a cheap box now costs 180 coins instead of 8.\n- Boxes show their pack-blocks as pips and a stack of waiting blocks behind the active one.\n- **Much more visual mine:** glowing crystals, light shafts, an animated rainbow frame, impact shockwaves, critical hits, tap combos (more damage the longer your streak), a pickaxe motion trail, blocks that squash and glow before they break, and coins that fly out when they do.\n- **Animated pack-opening backdrop:** an aurora, spinning rays and rising orbs that change colour with each card's rarity and pulse on good pulls.\n\n### Trade\n- The trade screens now show a step tracker (Connect, Add cards, Agree, Swap, Complete) with where you are, plus a \"Good to know before you trade\" section covering Wi-Fi, no money moving through the app, agreement resets, estimated values, and what completing does.\n\nNote: tested on an Android emulator and a desktop browser, not yet on a physical phone.\n"
+    },
+    {
+      "version": "0.15.0",
+      "versionCode": 17,
+      "tag": "v0.15.0-standalone",
+      "date": "2026-10-05T17:45:45Z",
+      "apk": "Collectify-v0.15.0.apk",
+      "size": 92392253,
+      "sha256": "a7f5f41ed0e4a52985c157b7f3b6700eb4952e68c1a9ac0d471787e8806d701a",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.15.0-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.15.0-standalone/Collectify-v0.15.0.apk",
+      "notes": "## Collectify 0.15.0\n\nInstalls over your existing Collectify (same signing key) - your binders, wishlist and trades are kept.\n\n### Scanner: fewer nonsense names\n- The old scanner read the whole card in one pass and guessed. It now reads several ways, matches the words against the real card names for the game, checks where on the card each word was found, reads collector numbers / set codes, compares the artwork, and combines that into a confidence.\n- It says **Confident**, **Likely** or \"couldn't read this card\" - it no longer fills the list with unrelated cards when the text is unreadable.\n- Takes the sharpest of a short burst of frames. OCR engine and English data are bundled, so scanning works offline.\n- On our 54-card test set (simulated phone photos) it identified the right card about 65% of the time, against about 24% for the old scanner, with a handful of wrong answers. Real-world results depend on light and focus.\n- Scans can take noticeably longer on slow phones than before.\n\n### Camera\n- The scanner now starts on the **rear camera**. Change it under the palette button, Preferences.\n\n### Trade\n- Rebuilt: one phone shows a QR, the other scans it, and both open the same live trade screen and see each other's cards. Either side can agree or leave; any change resets both agreements. Needs the same Wi-Fi or one phone's hotspot. Offline two-code trading is still there as a fallback.\n- Tested here between an Android emulator and a desktop client; not yet tested between two physical phones.\n\n### Treasure Box (new mini-game)\n- Buy a pickaxe, upgrade it, pick booster packs/boxes into stone/iron/gold/diamond/obsidian blocks, mine them (tap or let it run), rip the pack with a swipe, flip each card and swipe keep or bin. Keep to a \"Treasure Box\" binder; dupes go to the dupes bin (recyclable for coins). Daily chest included.\n- Game cards are for fun: they carry a 🎲 badge, never count toward your collection value and can't be traded. Coins are only for the game.\n\n### Quality of life\n- Undo after removing a card from a binder or wishlist.\n- Find a card inside a binder and jump to its page.\n- Haptics on/off and default camera in Preferences.\n- Fixed an overlapping \"Add cards\" button on the trade screen.\n"
+    },
+    {
+      "version": "0.14.1",
+      "versionCode": 16,
+      "tag": "v0.14.1-standalone",
+      "date": "2026-10-03T23:00:40Z",
+      "apk": "Collectify-v0.14.1.apk",
+      "size": 80115973,
+      "sha256": "7fd8821e9a0c3f80deed12b70a721ff50abc7cd8c3080a0e1a433b0fc94031e7",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.14.1-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.14.1-standalone/Collectify-v0.14.1.apk",
+      "notes": ""
+    },
+    {
+      "version": "0.14.0",
+      "versionCode": 15,
+      "tag": "v0.14.0-standalone",
+      "date": "2026-10-03T22:09:26Z",
+      "apk": "Collectify-v0.14.0.apk",
+      "size": 187320155,
+      "sha256": "8b2f381ddcb439e2f51780d104f66b590a2bd3388cf43b29cf60cf79f566cabd",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.14.0-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.14.0-standalone/Collectify-v0.14.0.apk",
+      "notes": ""
+    },
+    {
+      "version": "0.13.0",
+      "versionCode": 14,
+      "tag": "v0.13.0-standalone",
+      "date": "2026-10-03T18:51:35Z",
+      "apk": "Collectify-v0.13.0.apk",
+      "size": 187215726,
+      "sha256": "464eda10b901d86dc79c27eaec1079cedf2b32ec5fe085f332846fd2490f65b3",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.13.0-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.13.0-standalone/Collectify-v0.13.0.apk",
+      "notes": ""
+    },
+    {
+      "version": "0.12.0",
+      "versionCode": 13,
+      "tag": "v0.12.0-standalone",
+      "date": "2026-10-03T18:31:12Z",
+      "apk": "Collectify-v0.12.0.apk",
+      "size": 187301434,
+      "sha256": "2d199d7d2d4919cb7f667b8c6a5fb2d3c3df47147df69feaca17edcd1bb79a41",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.12.0-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.12.0-standalone/Collectify-v0.12.0.apk",
+      "notes": ""
+    },
+    {
+      "version": "0.11.1",
+      "versionCode": 12,
+      "tag": "v0.11.1-standalone",
+      "date": "2026-10-03T18:04:09Z",
+      "apk": "Collectify-v0.11.1.apk",
+      "size": 187184138,
+      "sha256": "c28380beb0f9f760c07c5e7cc00c47a20b54d63cccf8d42455d4bb9a7cbf7249",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.11.1-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.11.1-standalone/Collectify-v0.11.1.apk",
+      "notes": ""
+    }
+  ]
+}

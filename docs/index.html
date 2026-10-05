@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Collectify - scan, collect and trade your cards</title>
+<meta name="description" content="Collectify is an Android app for trading-card collectors: scan cards, keep binders, track prices across 94 TCGs, trade in person, all with the catalog bundled so it works offline.">
+<meta name="theme-color" content="#0b0e16">
+<style>
+:root { --bg: #070a12; --panel: #121826; --panel2: #1a2234; --line: rgba(255,255,255,.09); --text: #e9eef7; --muted: #9aa7bd; --gold: #e2b93b; --gold2: #ffd966; --ok: #4be08a; --bad: #ff7b7b; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: radial-gradient(900px 500px at 15% -10%, rgba(226,185,59,.13), transparent 60%), radial-gradient(800px 500px at 100% 10%, rgba(100,120,255,.12), transparent 60%), var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: var(--gold2); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+header.top { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(14px); background: rgba(7,10,18,.72); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 58px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; color: var(--gold2); text-decoration: none; }
+.mark { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(145deg, var(--gold2), var(--gold)); display: grid; place-items: center; color: #14100a; font-size: 16px; box-shadow: 0 4px 14px rgba(226,185,59,.4); }
+nav a { margin-left: 18px; font-size: 14px; color: var(--muted); text-decoration: none; }
+nav a:hover { color: var(--text); }
+.hero { padding: 72px 0 40px; text-align: center; }
+.hero h1 { font-size: clamp(34px, 6vw, 56px); line-height: 1.08; margin: 0 0 16px; letter-spacing: -.02em; }
+.hero h1 span { background: linear-gradient(135deg, var(--gold2), #ff9d5c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { max-width: 640px; margin: 0 auto 28px; color: var(--muted); font-size: 18px; }
+.btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 22px; border-radius: 14px; font-weight: 700; text-decoration: none; border: 1px solid var(--line); color: var(--text); background: var(--panel); transition: transform .15s, box-shadow .2s; }
+.btn:hover { transform: translateY(-2px); }
+.btn.primary { background: linear-gradient(180deg, var(--gold2), var(--gold)); color: #14100a; border: 0; box-shadow: 0 8px 26px rgba(226,185,59,.35); }
+.hero small { display: block; margin-top: 14px; color: var(--muted); font-size: 13px; }
+section { padding: 44px 0; }
+h2 { font-size: 28px; margin: 0 0 8px; letter-spacing: -.01em; }
+.lead { color: var(--muted); max-width: 720px; margin: 0 0 24px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+.card { background: linear-gradient(160deg, rgba(255,255,255,.055), rgba(255,255,255,.015)); border: 1px solid var(--line); border-radius: 18px; padding: 18px; }
+.card h3 { margin: 0 0 6px; font-size: 17px; }
+.card p { margin: 0; color: var(--muted); font-size: 14.5px; }
+.card .ic { font-size: 26px; margin-bottom: 8px; }
+.pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 99px; background: rgba(226,185,59,.15); color: var(--gold2); border: 1px solid rgba(226,185,59,.4); }
+ol.steps { padding-left: 20px; color: var(--muted); } ol.steps li { margin: 6px 0; } ol.steps b { color: var(--text); }
+.callout { border: 1px solid rgba(226,185,59,.4); background: rgba(226,185,59,.07); border-radius: 18px; padding: 18px 20px; }
+.callout h3 { margin: 0 0 6px; color: var(--gold2); }
+.callout p { margin: 0; color: var(--muted); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+td.hash { font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; word-break: break-all; color: var(--muted); max-width: 340px; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 18px; padding: 4px 12px; background: var(--panel); }
+button.copy { margin-left: 6px; background: var(--panel2); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 2px 8px; font-size: 11px; cursor: pointer; }
+pre { background: #05070d; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; overflow-x: auto; font-size: 13px; color: #cfe3ff; }
+details { border: 1px solid var(--line); border-radius: 14px; padding: 4px 14px; margin: 8px 0; background: var(--panel); }
+summary { cursor: pointer; padding: 10px 0; font-weight: 600; }
+details p { color: var(--muted); margin: 0 0 12px; }
+footer { padding: 40px 0 60px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); margin-top: 30px; }
+.ok { color: var(--ok); } .tag { font-size: 11px; background: rgba(75,224,138,.14); color: var(--ok); border-radius: 99px; padding: 1px 8px; margin-left: 6px; }
+@media (max-width: 600px) { nav { display: none; } .hero { padding-top: 48px; } }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="#top"><span class="mark">♠</span> Collectify</a>
+  <nav><a href="#features">Features</a><a href="#goals">Goals</a><a href="#approach">Approach</a><a href="#download">Download</a><a href="#verify">Verify</a></nav>
+</div></header>
+
+<main id="top">
+<div class="wrap">
+  <div class="hero">
+    <h1>Scan it. Bind it. <span>Trade it.</span></h1>
+    <p>Collectify is an Android app for trading-card collectors. Scan cards with your camera, keep them in binders, track what they're worth across 94 TCGs and trade in person. The whole card catalog is bundled, so it works offline.</p>
+    <div class="btns">
+      <a class="btn primary" id="hero-dl" href="https://github.com/unaveragetech/collectify-app/releases">⬇ Download the latest APK</a>
+      <a class="btn" href="#verify">Verify a download</a>
+    </div>
+    <small id="hero-sub">Android 8.0+ · sideload (not on the Play Store) · installs over older versions and keeps your data</small>
+  </div>
+
+  <section id="features">
+    <h2>What it does</h2>
+    <p class="lead">One app for the whole hobby loop: find the card, file it, value it, show it off, swap it.</p>
+    <div class="grid">
+      <div class="card"><div class="ic">📷</div><h3>Scanner</h3><p>Point the camera at a card. On-device OCR reads it, checks the words against the real card names for that game, and tells you how sure it is. If it can't read the card it says so instead of guessing.</p></div>
+      <div class="card"><div class="ic">📔</div><h3>Binders</h3><p>Page-by-page binders with value, search, sleeves, and covers you design with your own cards and stickers.</p></div>
+      <div class="card"><div class="ic">🔎</div><h3>Inspect &amp; grade</h3><p>Zoom into corners, edges and surface, measure centering and record a pseudo-grade. It's your own estimate and is labelled that way.</p></div>
+      <div class="card"><div class="ic">🤝</div><h3>In-person trading</h3><p>Scan a QR on the same Wi-Fi: both phones see the same trade live, either side can agree or leave, and any change resets both agreements. You swap the real cards; the app moves the records.</p></div>
+      <div class="card"><div class="ic">💲</div><h3>Prices</h3><p>Market prices for around half a million cards and products, adjusted for condition. They are estimates from tcgcsv.com (TCGplayer data), not offers.</p></div>
+      <div class="card"><div class="ic">⛏️</div><h3>Treasure Box</h3><p>A game on the side: mine booster packs out of rock, slice the foil, pull cards, tuck them into binders. Game cards are clearly badged, never count toward your collection's value, and trade only as marked DIGITAL cards.</p></div>
+    </div>
+  </section>
+
+  <section id="goals">
+    <h2>Goals</h2>
+    <p class="lead">What we're building toward, and what we won't compromise on.</p>
+    <div class="grid">
+      <div class="card"><h3>Your collection stays yours</h3><p>No accounts and no ads. Your binders, wishlist, grades and trades live on your device and survive updates. The app only goes online to sync prices or fetch card images, and for the update check when you tap it.</p></div>
+      <div class="card"><h3>Works anywhere</h3><p>At a card show with no signal, the full catalog, scanner and your binders still work. Everything needed is inside the app.</p></div>
+      <div class="card"><h3>Honest numbers</h3><p>Prices are labelled as estimates. A grade you set yourself is a "pseudo-grade". The scanner shows its confidence, and says "couldn't read it" when that's the truth.</p></div>
+      <div class="card"><h3>Fun that stays in its lane</h3><p>The Treasure Box is there for engagement, but it is kept visibly separate from your real collection so it never inflates your numbers.</p></div>
+    </div>
+    <div class="callout" style="margin-top:16px"><h3>Looking ahead: Collective</h3><p><span class="pill">Planned</span> A grading service with market data built in: graded cards would be public records, sealed with a tamper-evident seal, with faster turnaround and lower fees than the established graders. Collective is not live: there is no launch date or pricing yet, and until it exists the in-app grades are pseudo-grades only.</p></div>
+  </section>
+
+  <section id="approach">
+    <h2>How it's built</h2>
+    <p class="lead">A few deliberate choices that shape how the app behaves.</p>
+    <div class="grid">
+      <div class="card"><h3>Catalog inside the APK</h3><p>A snapshot of the tcgcsv catalog ships as a SQLite database, so there's nothing to download on first run. Updating the app brings a newer catalog without touching your own data.</p></div>
+      <div class="card"><h3>Local server + WebView</h3><p>The app embeds a tiny HTTP server on 127.0.0.1 and shows the same web interface as the desktop version. One codebase for the UI, camera access works because localhost is a secure context.</p></div>
+      <div class="card"><h3>Scanner = evidence, not a guess</h3><p>Several OCR passes, fuzzy matching against real card names, where on the card the words were found, collector numbers, and an artwork comparison are combined into one confidence. On our own 54-card test of simulated phone photos it named the right card about 65% of the time (the earlier approach managed about 24%), and it declines rather than inventing a name. Real-world results depend on light and focus.</p></div>
+      <div class="card"><h3>Trading you can trust at a glance</h3><p>Trades happen in a shared room on the host's phone over your local network, never a server of ours. Cards are marked physical or digital, a verification code appears on both phones, and nothing moves until both confirm.</p></div>
+      <div class="card"><h3>Signed updates</h3><p>Every release is signed with the same key, so a new version installs over the old one. We publish the SHA-256 of each APK so you can check you have the real file.</p></div>
+      <div class="card"><h3>Open about limits</h3><p>Collectify is young, independent software, so expect rough edges. It is not affiliated with TCGplayer, The Pokémon Company, Wizards of the Coast or any other publisher.</p></div>
+    </div>
+  </section>
+
+  <section id="download">
+    <h2>Download</h2>
+    <p class="lead">Grab the newest APK from the releases page. Older versions are listed for reference.</p>
+    <ol class="steps">
+      <li><b>Download</b> the latest <code>Collectify-vX.Y.Z.apk</code> (about 90 MB) and wait for it to finish.</li>
+      <li><b>Open it</b> and allow "install unknown apps" for your browser or file manager if Android asks. Play Protect may ask you to confirm because it's a sideload.</li>
+      <li>First launch unpacks the card catalog (roughly 400 MB of free space) and takes a few seconds.</li>
+    </ol>
+    <div class="tablewrap" style="margin-top:14px"><table>
+      <thead><tr><th>Version</th><th>Released</th><th>Size</th><th>SHA-256</th><th></th></tr></thead>
+      <tbody id="rel-rows"><tr><td colspan="5" style="color:var(--muted)">Loading releases…</td></tr></tbody>
+    </table></div>
+  </section>
+
+  <section id="verify">
+    <h2>Check you're up to date, and that your file is genuine</h2>
+    <p class="lead">Two ways: from inside the app, or by hand.</p>
+    <div class="grid">
+      <div class="card"><h3>In the app</h3><p>Tap the ℹ️ button, then <b>Check for updates</b>. It compares your installed version with the list above and, on Android, checks your installed APK's SHA-256 against the published one. If a newer version exists, <b>Releases page</b> opens it in your browser; install the new file over the app.</p></div>
+      <div class="card"><h3>By hand</h3><p>Compare your download with the hash in the table. On Windows PowerShell:</p><pre>Get-FileHash .\Collectify-vX.Y.Z.apk -Algorithm SHA256</pre><p>On macOS/Linux:</p><pre>sha256sum Collectify-vX.Y.Z.apk</pre></div>
+    </div>
+    <p class="lead" style="margin-top:14px">The data behind this page is public JSON: <a href="releases.json">releases.json</a> (every release) and <a href="latest.json">latest.json</a> (just the newest). A checksum only proves the file matches what we published; it can't tell you anything about a copy from somewhere else.</p>
+  </section>
+
+  <section>
+    <h2>Questions</h2>
+    <details><summary>Will updating erase my binders?</summary><p>No. Updates install over the existing app and keep your binders, wishlist, grades, trades and game progress, as long as the file is one of ours (same signing key). If you ever have an older build signed with a different key, you'd have to uninstall it first, which does remove local data.</p></details>
+    <details><summary>Why isn't it on the Play Store?</summary><p>It's distributed as a direct download for now. That's why Android asks you to allow installing it.</p></details>
+    <details><summary>Where do the prices come from?</summary><p>tcgcsv.com, which republishes TCGplayer's catalog and market prices. Treat them as estimates; condition adjustments are approximate.</p></details>
+    <details><summary>Is my data sent anywhere?</summary><p>No account exists, and your collection isn't uploaded. The app contacts tcgcsv.com if you sync prices, the TCGplayer image CDN to show card pictures, and this site when you tap "Check for updates". A live trade talks directly between the two phones on your network.</p></details>
+  </section>
+</div>
+</main>
+
+<footer><div class="wrap">
+  <div>Collectify · unofficial fan-made collector's tool · prices are estimates, not financial advice.</div>
+  <div style="margin-top:6px"><a href="https://github.com/unaveragetech/collectify-app/releases">Releases on GitHub</a></div>
+</div></footer>
+
+<script>
+const fmtSize = (n) => (n / 1048576).toFixed(0) + " MB";
+const fmtDate = (s) => { try { return new Date(s).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }); } catch { return ""; } };
+fetch("releases.json", { cache: "no-store" }).then((r) => r.json()).then((d) => {
+  const list = d.releases || [];
+  if (!list.length) throw new Error("none");
+  const rows = list.map((r, i) => `<tr>
+    <td><b>v${r.version}</b>${i === 0 ? '<span class="tag">latest</span>' : ""}<br><small style="color:var(--muted)">build ${r.versionCode ?? "?"}</small></td>
+    <td>${r.date ? fmtDate(r.date) : ""}</td><td>${fmtSize(r.size)}</td>
+    <td class="hash">${r.sha256}<button class="copy" data-h="${r.sha256}">copy</button></td>
+    <td><a href="${r.download}">APK</a> · <a href="${r.url}">notes</a></td></tr>`).join("");
+  document.getElementById("rel-rows").innerHTML = rows;
+  const l = list[0];
+  const dl = document.getElementById("hero-dl");
+  dl.href = l.download; dl.textContent = `⬇ Download v${l.version} (${fmtSize(l.size)})`;
+  document.getElementById("hero-sub").textContent = `Latest: v${l.version}${l.date ? " · " + fmtDate(l.date) : ""} · Android 8.0+ · sideload (not on the Play Store) · installs over older versions and keeps your data`;
+  document.querySelectorAll("button.copy").forEach((b) => b.addEventListener("click", () => { navigator.clipboard && navigator.clipboard.writeText(b.dataset.h); b.textContent = "copied"; setTimeout(() => (b.textContent = "copy"), 1200); }));
+}).catch(() => { document.getElementById("rel-rows").innerHTML = '<tr><td colspan="5">Couldn\'t load the list. See the <a href="https://github.com/unaveragetech/collectify-app/releases">releases page</a>.</td></tr>'; });
+</script>
+</body>
+</html>
