@@ -3,6 +3,18 @@
   "site": "https://unaveragetech.github.io/collectify-app/",
   "releases": [
     {
+      "version": "0.18.2",
+      "versionCode": 27,
+      "tag": "v0.18.2-standalone",
+      "date": "2026-10-06T18:04:47Z",
+      "apk": "Collectify-v0.18.2.apk",
+      "size": 93057881,
+      "sha256": "8d2c1a99811137eb6db869ca1e9e96859e618c82a044879cc60b9340ec0f6316",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.18.2-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.18.2-standalone/Collectify-v0.18.2.apk",
+      "notes": "## Collectify 0.18.2 — Island Care: every type plays at the same pace\n\nInstalls over your existing Collectify; your data is kept.\n\n### Fix\n- **Crops ripen in the same time for every type.** Berries used to take 25 minutes (Grass) up to 60 (Psychic), and any berry makes Basic Food, so a Grass starter could play much faster than a Fire or Water one. All six types now take 25 minutes, so your starter doesn't decide how much you can play. A type's identity is still its own berry, toy, preferred food and drop.\n- Crops you've already planted use the new time straight away.\n\nChecked in the Node simulation and by reading the built APK's data file; I did not replay the tutorial on a device for this one-number change.\n"
+    },
+    {
       "version": "0.18.1",
       "versionCode": 26,
       "tag": "v0.18.1-standalone",

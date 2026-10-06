@@ -1,11 +1,11 @@
 {
-  "version": "0.18.1",
-  "versionCode": 26,
-  "tag": "v0.18.1-standalone",
-  "date": "2026-10-06T17:13:16Z",
-  "apk": "Collectify-v0.18.1.apk",
-  "size": 93058245,
-  "sha256": "00c03d7e3b08006f2d426bad81b1ec4bfcdd9e4aaddd0e44d756fa02ff3bd423",
-  "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.18.1-standalone",
-  "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.18.1-standalone/Collectify-v0.18.1.apk"
+  "version": "0.18.2",
+  "versionCode": 27,
+  "tag": "v0.18.2-standalone",
+  "date": "2026-10-06T18:04:47Z",
+  "apk": "Collectify-v0.18.2.apk",
+  "size": 93057881,
+  "sha256": "8d2c1a99811137eb6db869ca1e9e96859e618c82a044879cc60b9340ec0f6316",
+  "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.18.2-standalone",
+  "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.18.2-standalone/Collectify-v0.18.2.apk"
 }
