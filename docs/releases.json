@@ -3,6 +3,18 @@
   "site": "https://unaveragetech.github.io/collectify-app/",
   "releases": [
     {
+      "version": "0.18.3",
+      "versionCode": 28,
+      "tag": "v0.18.3-standalone",
+      "date": "2026-10-06T18:36:53Z",
+      "apk": "Collectify-v0.18.3.apk",
+      "size": 93058588,
+      "sha256": "c4384c38383022494564c6c00e1e1b410b95336fef45bfcf22901401866f0f20",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.18.3-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.18.3-standalone/Collectify-v0.18.3.apk",
+      "notes": "## Collectify 0.18.3 — choose which game your daily pack comes from\n\nInstalls over your existing Collectify; your data is kept.\n\n### Fix\n- **Daily pack: pick your game.** The free daily pack used to come from a fixed mix of games, so a Pokémon collector could be handed Lorcana or Star Wars with no way out. The Daily pack screen now has a row of games along the top: **🎲 Mix**, Pokémon, Magic, Yu-Gi-Oh!, Lorcana, One Piece, Digimon, Star Wars and Flesh & Blood.\n- Choose a single game and you get **three different packs from that game**. Choose Mix for three games like before. Your choice is remembered (Pokémon until you change it).\n- You still get one pack a day: the three options for each game are fixed for the day, so flipping between games to re-roll doesn't work.\n- Only sets with enough cards to open are offered, so a game with none shows a short explanation instead of an empty screen.\n\nChecked by flipping between games, taking a pack and confirming the choice stuck in a desktop browser; the built app was installed in the emulator but I didn't repeat the daily-pack screen there.\n"
+    },
+    {
       "version": "0.18.2",
       "versionCode": 27,
       "tag": "v0.18.2-standalone",
