@@ -1,0 +1,79 @@
+name: Collectify
+options:
+  bundleIdPrefix: com.collectify
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.20.0"      # CI overrides these two from the release tag
+    CURRENT_PROJECT_VERSION: "33"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+packages:
+  CollectifyCore:
+    path: CollectifyCore
+targets:
+  Collectify:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+        excludes:
+          - Info.plist
+      # The web UI and the card catalog are not in git: CI (or tools/fetch_resources.sh) puts them here.
+      - path: Resources/www
+        type: folder
+      - path: Resources/collectify.db
+      - path: Resources/catalog_version.txt
+      - path: Resources/Assets.xcassets
+    dependencies:
+      - package: CollectifyCore
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Collectify
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        LSRequiresIPhoneOS: true
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UIRequiredDeviceCapabilities:
+          - arm64
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIStatusBarStyle: UIStatusBarStyleLightContent
+        UIUserInterfaceStyle: Dark
+        NSCameraUsageDescription: Collectify uses the camera to scan your trading cards and to read the QR code when you trade in person.
+        NSPhotoLibraryUsageDescription: Collectify can read a photo of a card from your library when you choose one to identify.
+        NSLocalNetworkUsageDescription: In-person trading connects your phone to your trading partner's phone over the local Wi-Fi network.
+        NSBonjourServices:
+          - _collectify._tcp
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+          NSAllowsArbitraryLoadsInWebContent: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.collectify.app
+        PRODUCT_NAME: Collectify
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: NO
+        CODE_SIGN_STYLE: Manual
+        DEVELOPMENT_TEAM: ""
+        CODE_SIGN_IDENTITY: ""
+schemes:
+  Collectify:
+    build:
+      targets:
+        Collectify: all
+    run:
+      config: Debug
+    archive:
+      config: Release

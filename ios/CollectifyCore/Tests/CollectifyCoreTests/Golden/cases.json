@@ -1,0 +1,116 @@
+[
+ {
+  "name": "search_pikachu",
+  "method": "GET",
+  "path": "/api/search?q=pikachu&limit=5",
+  "body": null,
+  "mode": "set:product_id",
+  "status": 200
+ },
+ {
+  "name": "search_charizard_cards",
+  "method": "GET",
+  "path": "/api/search?q=charizard&category_id=3&cards_only=1&limit=5",
+  "body": null,
+  "mode": "set:product_id",
+  "status": 200
+ },
+ {
+  "name": "search_two_words",
+  "method": "GET",
+  "path": "/api/search?q=dark%20charizard&limit=5",
+  "body": null,
+  "mode": "set:product_id",
+  "status": 200
+ },
+ {
+  "name": "search_nothing",
+  "method": "GET",
+  "path": "/api/search?q=zzzzqqqxx",
+  "body": null,
+  "mode": "exact",
+  "status": 200
+ },
+ {
+  "name": "categories",
+  "method": "GET",
+  "path": "/api/categories",
+  "body": null,
+  "mode": "exact",
+  "status": 200
+ },
+ {
+  "name": "categories_search",
+  "method": "GET",
+  "path": "/api/categories?search=magic",
+  "body": null,
+  "mode": "exact",
+  "status": 200
+ },
+ {
+  "name": "product",
+  "method": "GET",
+  "path": "/api/product/42402",
+  "body": null,
+  "mode": "exact",
+  "status": 200
+ },
+ {
+  "name": "scan_names",
+  "method": "GET",
+  "path": "/api/scan/names?category_id=3",
+  "body": null,
+  "mode": "names",
+  "status": 200
+ },
+ {
+  "name": "scan_lookup",
+  "method": "POST",
+  "path": "/api/scan/lookup",
+  "body": {
+   "names": [
+    "Pikachu",
+    "Charizard"
+   ],
+   "numbers": [
+    "058102"
+   ],
+   "category_id": 3,
+   "limit": 12
+  },
+  "mode": "set:product_id",
+  "status": 200
+ },
+ {
+  "name": "game_sealed_pack",
+  "method": "GET",
+  "path": "/api/game/sealed?category_id=3&kind=pack&limit=5",
+  "body": null,
+  "mode": "exact",
+  "status": 200
+ },
+ {
+  "name": "game_sealed_box",
+  "method": "GET",
+  "path": "/api/game/sealed?kind=box&limit=3",
+  "body": null,
+  "mode": "exact",
+  "status": 200
+ },
+ {
+  "name": "game_sealed_query",
+  "method": "GET",
+  "path": "/api/game/sealed?q=base%20set&kind=pack&limit=3",
+  "body": null,
+  "mode": "exact",
+  "status": 200
+ },
+ {
+  "name": "game_pool",
+  "method": "GET",
+  "path": "/api/game/pool?group_id=604",
+  "body": null,
+  "mode": "exact",
+  "status": 200
+ }
+]

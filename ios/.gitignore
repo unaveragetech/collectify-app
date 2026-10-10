@@ -1,0 +1,9 @@
+Resources/www/
+Resources/collectify.db
+Resources/catalog_version.txt
+Collectify.xcodeproj/
+App/Info.plist
+build/
+.build/
+DerivedData/
+*.ipa

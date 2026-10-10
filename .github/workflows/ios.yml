@@ -1,0 +1,90 @@
+name: Build iOS
+
+# Builds the unsigned Collectify .ipa for a release that already exists (created with the Android APK).
+# Run it from the Actions tab, or:  gh workflow run ios.yml -f version=0.20.0 -f build=33 -f catalog=11
+# It tests the Swift core against the real catalog, builds the app and attaches
+# Collectify-v<version>.ipa (+ .sha256) to the release v<version>-standalone.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "App version, e.g. 0.20.0 (the release tag is v<version>-standalone)"
+        required: true
+      build:
+        description: "Build number: same as the Android versionCode, e.g. 33"
+        required: true
+      catalog:
+        description: "Catalog version (read from the release catalog-v<N>), e.g. 11"
+        required: true
+      tag:
+        description: "Release to read ios-www.zip from and attach the .ipa to (default: v<version>-standalone)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ inputs.version }}
+      BUILD: ${{ inputs.build }}
+      CATALOG: ${{ inputs.catalog }}
+      TAG: ${{ inputs.tag != '' && inputs.tag || format('v{0}-standalone', inputs.version) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch the web UI and card catalog
+        run: |
+          set -euo pipefail
+          mkdir -p ios/Resources
+          gh release download "$TAG" -R "$GITHUB_REPOSITORY" -p ios-www.zip -D "$RUNNER_TEMP"
+          unzip -q -o "$RUNNER_TEMP/ios-www.zip" -d ios/Resources
+          test -f ios/Resources/www/index.html
+          gh release download "catalog-v${CATALOG}" -R "$GITHUB_REPOSITORY" -p collectify.db.gz -D "$RUNNER_TEMP"
+          gunzip -c "$RUNNER_TEMP/collectify.db.gz" > ios/Resources/collectify.db
+          echo "$CATALOG" > ios/Resources/catalog_version.txt
+          ls -la ios/Resources ios/Resources/www | head -30
+
+      - name: Test the Swift core (against the real catalog)
+        working-directory: ios/CollectifyCore
+        env:
+          COLLECTIFY_CATALOG_DB: ${{ github.workspace }}/ios/Resources/collectify.db
+        run: swift test 2>&1 | tail -80
+
+      - name: Generate the Xcode project
+        working-directory: ios
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Build (unsigned)
+        working-directory: ios
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project Collectify.xcodeproj -scheme Collectify -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="$BUILD" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            | tail -60
+
+      - name: Package the .ipa
+        run: |
+          set -euo pipefail
+          APP="ios/build/Build/Products/Release-iphoneos/Collectify.app"
+          test -d "$APP"
+          rm -rf "$RUNNER_TEMP/ipa" && mkdir -p "$RUNNER_TEMP/ipa/Payload"
+          cp -R "$APP" "$RUNNER_TEMP/ipa/Payload/"
+          (cd "$RUNNER_TEMP/ipa" && zip -qry "$GITHUB_WORKSPACE/Collectify-v${VERSION}.ipa" Payload)
+          shasum -a 256 "Collectify-v${VERSION}.ipa" | tee "Collectify-v${VERSION}.ipa.sha256"
+          ls -la "Collectify-v${VERSION}.ipa"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" -c "Print :CFBundleVersion" -c "Print :MinimumOSVersion" "$APP/Info.plist"
+
+      - name: Attach to the release
+        run: |
+          gh release upload "$TAG" "Collectify-v${VERSION}.ipa" "Collectify-v${VERSION}.ipa.sha256" -R "$GITHUB_REPOSITORY" --clobber
