@@ -92,7 +92,11 @@ jobs:
           xcrun simctl boot "$UDID"
           xcrun simctl bootstatus "$UDID" -b
           xcrun simctl install "$UDID" "$APP"
-          xcrun simctl launch "$UDID" com.collectify.app
+          sleep 20
+          for i in 1 2 3 4 5 6 7 8; do
+            xcrun simctl launch "$UDID" com.collectify.app && break
+            sleep 15
+          done
           for i in $(seq 1 60); do
             code=$(curl -s -m 5 -o /dev/null -w "%{http_code}" http://127.0.0.1:8321/api/binders || true)
             [ "$code" = "200" ] && break
