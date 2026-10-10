@@ -140,7 +140,7 @@ final class RootViewController: UIViewController, WKUIDelegate, WKNavigationDele
             wv.callAsyncJavaScript("return await (async () => { \(code) })()", arguments: [:], in: nil, in: .page) { r in
                 switch r {
                 case .success(let v):
-                    if let v = v, JSONSerialization.isValidJSONObject(["v": v]) {
+                    if !(v is NSNull), JSONSerialization.isValidJSONObject(["v": v]) {
                         let d = (try? JSONSerialization.data(withJSONObject: ["v": v])) ?? Data()
                         done(String(data: d, encoding: .utf8) ?? "{}")
                     } else { done("{\"v\":null}") }
