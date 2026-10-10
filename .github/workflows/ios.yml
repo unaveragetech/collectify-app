@@ -84,7 +84,7 @@ jobs:
           xcodebuild build \
             -project Collectify.xcodeproj -scheme Collectify -configuration Debug \
             -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath build-sim CODE_SIGNING_ALLOWED=NO | tail -5
+            -derivedDataPath build-sim CODE_SIGNING_ALLOWED=NO > "$GITHUB_WORKSPACE/smoke/build.log" 2>&1 || { grep -E "error:" "$GITHUB_WORKSPACE/smoke/build.log" | sort -u | head -20; exit 1; }
           APP="build-sim/Build/Products/Debug-iphonesimulator/Collectify.app"
           xcrun simctl list devices available | tee "$GITHUB_WORKSPACE/smoke/devices.txt" | head -30
           UDID=$(grep -m1 -E "iPhone (1[5-9]|Air)" "$GITHUB_WORKSPACE/smoke/devices.txt" | grep -oE "[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}")
