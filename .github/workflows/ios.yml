@@ -75,6 +75,43 @@ jobs:
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
             | tail -60
 
+      - name: Smoke test in the iOS Simulator
+        id: smoke
+        continue-on-error: true
+        working-directory: ios
+        run: |
+          set -o pipefail
+          xcodebuild build             -project Collectify.xcodeproj -scheme Collectify -configuration Debug             -sdk iphonesimulator -destination 'generic/platform=iOS Simulator'             -derivedDataPath build-sim CODE_SIGNING_ALLOWED=NO | tail -5
+          APP="build-sim/Build/Products/Debug-iphonesimulator/Collectify.app"
+          UDID=$(xcrun simctl list devices available | grep -m1 -E "iPhone (1[5-9]|Air)[^(]*\(" | grep -oE "[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}")
+          echo "simulator $UDID"
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl install "$UDID" "$APP"
+          xcrun simctl launch "$UDID" com.collectify.app
+          mkdir -p "$GITHUB_WORKSPACE/smoke"
+          for i in $(seq 1 40); do
+            if curl -s -m 5 -o /dev/null -w "%{http_code}" http://127.0.0.1:8321/api/binders | grep -q 200; then break; fi
+            sleep 3
+          done
+          curl -s -m 20 http://127.0.0.1:8321/api/binders | tee "$GITHUB_WORKSPACE/smoke/binders.json"; echo
+          curl -s -m 20 "http://127.0.0.1:8321/api/search?q=pikachu&limit=2" | head -c 600 | tee "$GITHUB_WORKSPACE/smoke/search.json"; echo
+          curl -s -m 20 -o /dev/null -w "index %{http_code} %{size_download} bytes
+" http://127.0.0.1:8321/ | tee "$GITHUB_WORKSPACE/smoke/index.txt"
+          curl -s -m 20 -o /dev/null -w "island_world %{http_code}
+" http://127.0.0.1:8321/static/island_world.js
+          sleep 15
+          xcrun simctl io "$UDID" screenshot "$GITHUB_WORKSPACE/smoke/home.png"
+          xcrun simctl spawn "$UDID" log show --last 2m --predicate 'process == "Collectify"' --style compact 2>/dev/null | tail -40 > "$GITHUB_WORKSPACE/smoke/log.txt" || true
+
+      - name: Upload smoke test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulator-smoke
+          path: smoke/
+          if-no-files-found: ignore
+
       - name: Package the .ipa
         run: |
           set -euo pipefail
