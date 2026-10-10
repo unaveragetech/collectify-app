@@ -34,7 +34,12 @@ final class Services {
         let www = Bundle.main.resourceURL?.appendingPathComponent("www")
         let api = APIServer(db: db, www: www)
         api.onRoomOpen = { [weak self] in self?.ensureRoomServer() }
-        let server = HTTPServer(port: Self.apiPort, binding: .loopback) { api.handle($0) }
+        let server = HTTPServer(port: Self.apiPort, binding: .loopback) { [weak self] req in
+            #if DEBUG
+            if req.path == "/__debug/js", let me = self { return me.runDebugJS(req) }
+            #endif
+            return api.handle(req)
+        }
         if !server.start() { throw SQLError("Couldn't start the local server" + (server.lastError.map { ": \($0)" } ?? ".")) }
 
         lock.lock()
@@ -43,6 +48,26 @@ final class Services {
         self.server = server
         lock.unlock()
     }
+
+    #if DEBUG
+    /// Debug builds only (CI smoke test): POST some JavaScript to /__debug/js and get its result back.
+    var debugEval: ((String, @escaping (String) -> Void) -> Void)?
+
+    private func runDebugJS(_ req: HTTPRequest) -> HTTPResponse {
+        guard let eval = debugEval else { return HTTPResponse(status: 503, contentType: "text/plain", body: Data("no web view yet".utf8)) }
+        let code = String(data: req.body, encoding: .utf8) ?? ""
+        let sem = DispatchSemaphore(value: 0)
+        var result = ""
+        DispatchQueue.main.async {
+            eval(code) { r in
+                result = r
+                sem.signal()
+            }
+        }
+        if sem.wait(timeout: .now() + 60) == .timedOut { result = "{\"error\":\"timeout\"}" }
+        return HTTPResponse(status: 200, contentType: "application/json", body: Data(result.utf8))
+    }
+    #endif
 
     func ensureRunning() {
         server?.ensureRunning()

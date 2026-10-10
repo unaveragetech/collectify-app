@@ -134,6 +134,21 @@ final class RootViewController: UIViewController, WKUIDelegate, WKNavigationDele
         ])
         bridge.webView = wv
         webView = wv
+        #if DEBUG
+        services.debugEval = { [weak wv] code, done in
+            guard let wv = wv else { return done("{\"error\":\"gone\"}") }
+            wv.callAsyncJavaScript("return await (async () => { \(code) })()", arguments: [:], in: nil, in: .page) { r in
+                switch r {
+                case .success(let v):
+                    if let v = v, JSONSerialization.isValidJSONObject(["v": v]) {
+                        let d = (try? JSONSerialization.data(withJSONObject: ["v": v])) ?? Data()
+                        done(String(data: d, encoding: .utf8) ?? "{}")
+                    } else { done("{\"v\":null}") }
+                case .failure(let e): done("{\"error\":\"\(e.localizedDescription.replacingOccurrences(of: "\"", with: "'"))\"}")
+                }
+            }
+        }
+        #endif
     }
 
     private func loadPage() {
