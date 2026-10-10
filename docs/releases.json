@@ -3,6 +3,18 @@
   "site": "https://unaveragetech.github.io/collectify-app/",
   "releases": [
     {
+      "version": "0.19.2",
+      "versionCode": 31,
+      "tag": "v0.19.2-standalone",
+      "date": "2026-10-10T17:27:00Z",
+      "apk": "Collectify-v0.19.2.apk",
+      "size": 94299446,
+      "sha256": "b85c356afc71f7565082ceef722fdd4119b0a78910a3af77d74d5d056e9d34e4",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.19.2-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.19.2-standalone/Collectify-v0.19.2.apk",
+      "notes": "## Collectify 0.19.2 — binders are filled from Scan only\n\nInstalls over your existing Collectify; your data is kept.\n\n- **Wishlist:** the \"＋ Add to a binder\" button on each wish is gone. A wish still shows \"✓ You have this in a binder\" once you own it, and is crossed off automatically when you add it from Scan.\n- **Browse:** a card's detail sheet no longer has an Add to binder button; it now offers **♡ Add to wishlist** and Close. Tapping a printing in \"Other printings\" or swiping through them opens that printing's details instead of adding it.\n- Cards go into binders from the **Scan** tab (camera or Type), as well as through trades and Treasure Box pulls you keep. The empty-binder hint says so.\n\n### Tested, and what wasn't\nChecked in a desktop browser that the detail sheet shows the new buttons and no binder button, and that wishlist rows have no add button. Not retested on a phone.\n"
+    },
+    {
       "version": "0.19.1",
       "versionCode": 30,
       "tag": "v0.19.1-standalone",
