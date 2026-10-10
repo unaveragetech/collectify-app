@@ -3,6 +3,18 @@
   "site": "https://unaveragetech.github.io/collectify-app/",
   "releases": [
     {
+      "version": "0.19.3",
+      "versionCode": 32,
+      "tag": "v0.19.3-standalone",
+      "date": "2026-10-10T17:39:09Z",
+      "apk": "Collectify-v0.19.3.apk",
+      "size": 94300760,
+      "sha256": "43e32e4424b1a5bc319dd45456fb92f6a25707d18bb684e81229ed245df43126",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.19.3-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.19.3-standalone/Collectify-v0.19.3.apk",
+      "notes": "## Collectify 0.19.3 — pickaxe reset, and a daily pack limit per set\n\nInstalls over your existing Collectify; your data is kept.\n\n### Reset an over-powered pickaxe\nSaves from before the pickaxe overhaul could carry upgrade levels that no longer fit the new balance.\n- **The Forge has a Reset pickaxe button** (bottom of the upgrade list): it costs **5,000 coins** and puts every upgrade back to level 0. You keep the pickaxe itself, your remaining coins, packs, cards, tickets and prestige.\n- **Once per prestige rank.** Ascending gives you another reset. It asks you to confirm and shows how many levels you are giving up.\n- On first load, any upgrade level above today's cap is also pulled back to the cap.\n\n### Daily pack limit per set\nBuying lots of cheap packs, opening them and selling the dupes could produce unlimited coins.\n- **You can buy 10 packs per set (series) per day with coins.** A whole box uses a set's full daily allowance. The limit resets at midnight.\n- Pick packs shows a \"🛒 3/10 today\" counter on sets you've bought from, and the button is disabled with an explanation once you hit the limit. Other sets are unaffected.\n- It applies to normal claims, Mystery Blocks (the set of the hidden pack counts) and Auto-queue (which now stops at the limit).\n- **Not limited:** the free daily pack, hourly pack tokens and box tickets, which are already rationed by time.\n\n### Tested, and what wasn't\nChecked in a desktop browser: 12 buys from one set stopped at 10 while other sets and a box still worked, the counter rolled over on a new day, the row showed 10/10 and a disabled button, and the reset charged 5,000, zeroed 375 levels, kept the pickaxe and then disabled itself. Not tested: Mystery Block and Auto-queue at the limit, on a phone.\n"
+    },
+    {
       "version": "0.19.2",
       "versionCode": 31,
       "tag": "v0.19.2-standalone",
