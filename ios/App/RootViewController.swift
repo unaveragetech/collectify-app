@@ -135,17 +135,20 @@ final class RootViewController: UIViewController, WKUIDelegate, WKNavigationDele
         bridge.webView = wv
         webView = wv
         #if DEBUG
+        // CI smoke test hook: run a script and poll for its (JSON) result. Plain evaluateJavaScript only:
+        // the Result-based callAsyncJavaScript overload pulls in a Swift overlay missing from older iOS runtimes.
         services.debugEval = { [weak wv] code, done in
             guard let wv = wv else { return done("{\"error\":\"gone\"}") }
-            wv.callAsyncJavaScript("return await (async () => { \(code) })()", arguments: [:], in: nil, in: .page) { r in
-                switch r {
-                case .success(let v):
-                    if !(v is NSNull), JSONSerialization.isValidJSONObject(["v": v]) {
-                        let d = (try? JSONSerialization.data(withJSONObject: ["v": v])) ?? Data()
-                        done(String(data: d, encoding: .utf8) ?? "{}")
-                    } else { done("{\"v\":null}") }
-                case .failure(let e): done("{\"error\":\"\(e.localizedDescription.replacingOccurrences(of: "\"", with: "'"))\"}")
+            let wrapped = "window.__dbg = null; (async () => { try { var v = await (async () => { \(code) })(); window.__dbg = JSON.stringify({v: v === undefined ? null : v}); } catch (e) { window.__dbg = JSON.stringify({error: String(e)}); } })(); 1"
+            wv.evaluateJavaScript(wrapped) { _, _ in
+                func poll(_ n: Int) {
+                    wv.evaluateJavaScript("window.__dbg") { r, _ in
+                        if let s = r as? String { return done(s) }
+                        if n <= 0 { return done("{\"error\":\"timeout\"}") }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { poll(n - 1) }
+                    }
                 }
+                poll(180)
             }
         }
         #endif

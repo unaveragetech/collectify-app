@@ -139,12 +139,15 @@ jobs:
             sleep 15
           done
           DATA=$(xcrun simctl get_app_container "$UDID" com.collectify.app data)
+          dead=0
           for i in $(seq 1 300); do
             code=$(curl -s -m 5 -o /dev/null -w "%{http_code}" http://127.0.0.1:8321/api/binders || true)
             [ "$code" = "200" ] && break
-            if [ $((i % 20)) -eq 0 ]; then
-              echo "waiting ($i): http $code"; xcrun simctl spawn "$UDID" launchctl list | grep -i collectify || echo "app process not running"
+            if [ $((i % 10)) -eq 0 ]; then
+              echo "waiting ($i): http $code"
+              if xcrun simctl spawn "$UDID" launchctl list | grep -qi collectify; then dead=0; else dead=$((dead + 1)); echo "app process not running ($dead)"; fi
               (ls -la "$DATA/Library/Application Support" 2>&1 | tail -4) || true
+              [ "$dead" -ge 3 ] && break
             fi
             sleep 3
           done
