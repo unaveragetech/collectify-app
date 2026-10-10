@@ -97,7 +97,7 @@ func jsonString(_ any: Any) -> String {
 }
 
 extension Array {
-    func take(_ n: Int) -> [Element] { Array(prefix(max(0, n))) }
+    func take(_ n: Int) -> [Element] { Array(prefix(Swift.max(0, n))) }
 }
 
 extension Array where Element: Hashable {

@@ -53,7 +53,9 @@ jobs:
         working-directory: ios/CollectifyCore
         env:
           COLLECTIFY_CATALOG_DB: ${{ github.workspace }}/ios/Resources/collectify.db
-        run: swift test 2>&1 | tail -80
+        run: |
+          set -o pipefail
+          swift test 2>&1 | tail -150
 
       - name: Generate the Xcode project
         working-directory: ios
