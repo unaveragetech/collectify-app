@@ -3,6 +3,22 @@
   "site": "https://unaveragetech.github.io/collectify-app/",
   "releases": [
     {
+      "version": "0.21.1",
+      "versionCode": 35,
+      "tag": "v0.21.1-standalone",
+      "date": "2026-10-10T23:26:53Z",
+      "apk": "Collectify-v0.21.1.apk",
+      "size": 94326498,
+      "sha256": "6c69ef0b5c629d1ed7acca44e18a76deb93a8fa1b4a3823dfdc650118bd3031a",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.21.1-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.21.1-standalone/Collectify-v0.21.1.apk",
+      "notes": "## Collectify 0.21.1 — the Wooden Pickaxe is free\n\nAndroid `.apk` and iPhone/iPad `.ipa`, same version, same change.\n\n- **New players start with the Wooden Pickaxe, already equipped.** No more spending 40 coins on a pickaxe before you can mine; you keep your starting 150 coins for your first block.\n- **Existing players who never bought one get it automatically** the next time they open the Treasure Box (their coins are untouched).\n- The Treasure Box welcome text now says you start with a Wooden Pickaxe.\n- Also fixed: since 0.19.1 the Forge's \"Buy a Wooden Pickaxe\" button was malformed and did nothing, which could leave a brand-new player unable to start mining. The button is repaired, and it no longer shows because the pickaxe is free.\n\n### Tested\nChecked in a desktop browser: a saved game with no pickaxe loads with the Wooden Pickaxe owned, the Forge shows no buy button, and a fresh game defaults to owning it. Not retested on a phone.\n",
+      "ipa": "Collectify-v0.21.1.ipa",
+      "ipaSize": 89678738,
+      "ipaSha256": "9db3948ad30ead2e1608ca58a23f7ea3698d876b581aa0a6927db0dff88c23bc",
+      "ipaDownload": "https://github.com/unaveragetech/collectify-app/releases/download/v0.21.1-standalone/Collectify-v0.21.1.ipa"
+    },
+    {
       "version": "0.21.0",
       "versionCode": 34,
       "tag": "v0.21.0-standalone",
