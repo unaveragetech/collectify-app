@@ -144,12 +144,16 @@ jobs:
             [ "$code" = "200" ] && break
             if [ $((i % 20)) -eq 0 ]; then
               echo "waiting ($i): http $code"; xcrun simctl spawn "$UDID" launchctl list | grep -i collectify || echo "app process not running"
-              ls -la "$DATA/Library/Application Support" 2>&1 | tail -4
+              (ls -la "$DATA/Library/Application Support" 2>&1 | tail -4) || true
             fi
             sleep 3
           done
           echo "binders: $code"
-          [ "$code" = "200" ] || { xcrun simctl spawn "$UDID" log show --last 10m --predicate 'process == "Collectify"' --style compact 2>/dev/null | tail -60 > "$GITHUB_WORKSPACE/smoke/log.txt"; exit 1; }
+          if [ "$code" != "200" ]; then
+            xcrun simctl spawn "$UDID" log show --last 15m --predicate 'process == "Collectify" OR eventMessage CONTAINS "Collectify"' --style compact 2>/dev/null | tail -150 > "$GITHUB_WORKSPACE/smoke/log.txt" || true
+            cp ~/Library/Logs/DiagnosticReports/*ollectify* "$GITHUB_WORKSPACE/smoke/" 2>/dev/null || true
+            exit 1
+          fi
           curl -s -m 20 http://127.0.0.1:8321/api/binders | tee "$GITHUB_WORKSPACE/smoke/binders.json"; echo
           curl -s -m 30 "http://127.0.0.1:8321/api/search?q=pikachu&limit=2" | head -c 700 | tee "$GITHUB_WORKSPACE/smoke/search.json"; echo
           curl -s -m 20 -o /dev/null -w "index %{http_code} %{size_download} bytes\n" http://127.0.0.1:8321/ | tee "$GITHUB_WORKSPACE/smoke/index.txt"
