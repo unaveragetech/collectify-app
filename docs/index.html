@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Collectify - scan, collect and trade your cards</title>
-<meta name="description" content="Collectify is an Android app for trading-card collectors: scan cards, keep binders, track prices across 94 TCGs, trade in person, all with the catalog bundled so it works offline.">
+<meta name="description" content="Collectify is an Android and iPhone app for trading-card collectors: scan cards, keep binders, track prices across 94 TCGs, trade in person, all with the catalog bundled so it works offline.">
 <meta name="theme-color" content="#0b0e16">
 <style>
 :root { --bg: #070a12; --panel: #121826; --panel2: #1a2234; --line: rgba(255,255,255,.09); --text: #e9eef7; --muted: #9aa7bd; --gold: #e2b93b; --gold2: #ffd966; --ok: #4be08a; --bad: #ff7b7b; }
@@ -66,12 +66,13 @@ footer { padding: 40px 0 60px; color: var(--muted); font-size: 13px; border-top:
 <div class="wrap">
   <div class="hero">
     <h1>Scan it. Bind it. <span>Trade it.</span></h1>
-    <p>Collectify is an Android app for trading-card collectors. Scan cards with your camera, keep them in binders, track what they're worth across 94 TCGs and trade in person. The whole card catalog is bundled, so it works offline.</p>
+    <p>Collectify is an Android and iPhone app for trading-card collectors. Scan cards with your camera, keep them in binders, track what they're worth across 94 TCGs and trade in person. The whole card catalog is bundled, so it works offline.</p>
     <div class="btns">
       <a class="btn primary" id="hero-dl" href="https://github.com/unaveragetech/collectify-app/releases">⬇ Download the latest APK</a>
+      <a class="btn" id="hero-dl-ios" href="https://github.com/unaveragetech/collectify-app/releases" style="display:none">⬇ iPhone (.ipa)</a>
       <a class="btn" href="#verify">Verify a download</a>
     </div>
-    <small id="hero-sub">Android 8.0+ · sideload (not on the Play Store) · installs over older versions and keeps your data</small>
+    <small id="hero-sub">Android 8.0+ and iOS 15+ · sideload (not in the app stores) · installs over older versions and keeps your data</small>
   </div>
 
   <section id="features">
@@ -104,25 +105,32 @@ footer { padding: 40px 0 60px; color: var(--muted); font-size: 13px; border-top:
     <h2>How it's built</h2>
     <p class="lead">A few deliberate choices that shape how the app behaves.</p>
     <div class="grid">
-      <div class="card"><h3>Catalog inside the APK</h3><p>A snapshot of the tcgcsv catalog ships as a SQLite database, so there's nothing to download on first run. Updating the app brings a newer catalog without touching your own data.</p></div>
-      <div class="card"><h3>Local server + WebView</h3><p>The app embeds a tiny HTTP server on 127.0.0.1 and shows the same web interface as the desktop version. One codebase for the UI, camera access works because localhost is a secure context.</p></div>
+      <div class="card"><h3>Catalog inside the app</h3><p>A snapshot of the tcgcsv catalog ships as a SQLite database, so there's nothing to download on first run. Updating the app brings a newer catalog without touching your own data.</p></div>
+      <div class="card"><h3>Local server + WebView</h3><p>The app embeds a tiny HTTP server on 127.0.0.1 and shows the same web interface as the desktop version. One codebase for the UI on desktop, Android and iPhone; the on-device server is written natively for each (Kotlin and Swift) and tested against each other. Camera access works because localhost is a secure context.</p></div>
       <div class="card"><h3>Scanner = evidence, not a guess</h3><p>Several OCR passes, fuzzy matching against real card names, where on the card the words were found, collector numbers, and an artwork comparison are combined into one confidence. On our own 54-card test of simulated phone photos it named the right card about 65% of the time (the earlier approach managed about 24%), and it declines rather than inventing a name. Real-world results depend on light and focus.</p></div>
       <div class="card"><h3>Trading you can trust at a glance</h3><p>Trades happen in a shared room on the host's phone over your local network, never a server of ours. Cards are marked physical or digital, a verification code appears on both phones, and nothing moves until both confirm.</p></div>
-      <div class="card"><h3>Signed updates</h3><p>Every release is signed with the same key, so a new version installs over the old one. We publish the SHA-256 of each APK so you can check you have the real file.</p></div>
+      <div class="card"><h3>Same release, both phones</h3><p>Every version ships as an Android APK (signed with one key, so updates install over the old one) and an iPhone .ipa built from the same web interface. We publish the SHA-256 of each file so you can check you have the real one.</p></div>
       <div class="card"><h3>Open about limits</h3><p>Collectify is young, independent software, so expect rough edges. It is not affiliated with TCGplayer, The Pokémon Company, Wizards of the Coast or any other publisher.</p></div>
     </div>
   </section>
 
   <section id="download">
     <h2>Download</h2>
-    <p class="lead">Grab the newest APK from the releases page. Older versions are listed for reference.</p>
-    <ol class="steps">
-      <li><b>Download</b> the latest <code>Collectify-vX.Y.Z.apk</code> (about 90 MB) and wait for it to finish.</li>
-      <li><b>Open it</b> and allow "install unknown apps" for your browser or file manager if Android asks. Play Protect may ask you to confirm because it's a sideload.</li>
-      <li>First launch unpacks the card catalog (roughly 400 MB of free space) and takes a few seconds.</li>
-    </ol>
+    <p class="lead">Grab the newest file for your phone from the releases page. Older versions are listed for reference.</p>
+    <div class="grid">
+      <div class="card"><h3>Android (8.0+)</h3><ol class="steps">
+        <li><b>Download</b> the latest <code>Collectify-vX.Y.Z.apk</code> (about 90 MB) and wait for it to finish.</li>
+        <li><b>Open it</b> and allow "install unknown apps" for your browser or file manager if Android asks. Play Protect may ask you to confirm because it's a sideload.</li>
+        <li>First launch unpacks the card catalog (roughly 400 MB of free space) and takes a few seconds.</li>
+      </ol></div>
+      <div class="card"><h3>iPhone / iPad (iOS 15+)</h3><ol class="steps">
+        <li><b>Download</b> the latest <code>Collectify-vX.Y.Z.ipa</code> (about 90 MB). It isn't in the App Store and is not signed, so install it with a sideloading tool that signs it with your own Apple ID: <a href="https://altstore.io">AltStore</a>, <a href="https://sideloadly.io">Sideloadly</a> or TrollStore.</li>
+        <li>Allow the camera when asked (for scanning and trade QR codes) and, for in-person trades, Local Network access.</li>
+        <li>First launch unpacks the card catalog (roughly 400 MB of free space). With a free Apple ID, iOS lets a sideloaded app run for 7 days before you refresh it; your data is kept.</li>
+      </ol></div>
+    </div>
     <div class="tablewrap" style="margin-top:14px"><table>
-      <thead><tr><th>Version</th><th>Released</th><th>Size</th><th>SHA-256</th><th></th></tr></thead>
+      <thead><tr><th>Version</th><th>Released</th><th>Size</th><th>SHA-256</th><th>Get it</th></tr></thead>
       <tbody id="rel-rows"><tr><td colspan="5" style="color:var(--muted)">Loading releases…</td></tr></tbody>
     </table></div>
   </section>
@@ -131,8 +139,8 @@ footer { padding: 40px 0 60px; color: var(--muted); font-size: 13px; border-top:
     <h2>Check you're up to date, and that your file is genuine</h2>
     <p class="lead">Two ways: from inside the app, or by hand.</p>
     <div class="grid">
-      <div class="card"><h3>In the app</h3><p>Tap the ℹ️ button, then <b>Check for updates</b>. It compares your installed version with the list above and, on Android, checks your installed APK's SHA-256 against the published one. If a newer version exists, <b>Releases page</b> opens it in your browser; install the new file over the app.</p></div>
-      <div class="card"><h3>By hand</h3><p>Compare your download with the hash in the table. On Windows PowerShell:</p><pre>Get-FileHash .\Collectify-vX.Y.Z.apk -Algorithm SHA256</pre><p>On macOS/Linux:</p><pre>sha256sum Collectify-vX.Y.Z.apk</pre></div>
+      <div class="card"><h3>In the app</h3><p>Tap the ℹ️ button, then <b>Check for updates</b>. It compares your installed version with the list above and, on Android, checks your installed APK's SHA-256 against the published one (iOS doesn't let an app read its own package, so there you compare the .ipa you downloaded). If a newer version exists, <b>Releases page</b> opens it in your browser; install the new file over the app.</p></div>
+      <div class="card"><h3>By hand</h3><p>Compare your download with the hash in the table. On Windows PowerShell:</p><pre>Get-FileHash .\Collectify-vX.Y.Z.apk -Algorithm SHA256</pre><p>On macOS/Linux:</p><pre>sha256sum Collectify-vX.Y.Z.apk   # or .ipa</pre></div>
     </div>
     <p class="lead" style="margin-top:14px">The data behind this page is public JSON: <a href="releases.json">releases.json</a> (every release) and <a href="latest.json">latest.json</a> (just the newest). A checksum only proves the file matches what we published; it can't tell you anything about a copy from somewhere else.</p>
   </section>
@@ -140,7 +148,8 @@ footer { padding: 40px 0 60px; color: var(--muted); font-size: 13px; border-top:
   <section>
     <h2>Questions</h2>
     <details><summary>Will updating erase my binders?</summary><p>No. Updates install over the existing app and keep your binders, wishlist, grades, trades and game progress, as long as the file is one of ours (same signing key). If you ever have an older build signed with a different key, you'd have to uninstall it first, which does remove local data.</p></details>
-    <details><summary>Why isn't it on the Play Store?</summary><p>It's distributed as a direct download for now. That's why Android asks you to allow installing it.</p></details>
+    <details><summary>Why isn't it on the Play Store or App Store?</summary><p>It's distributed as a direct download for now. That's why Android asks you to allow installing it, and why the iPhone build has to be installed with a sideloading tool.</p></details>
+    <details><summary>Is the iPhone app the same as the Android one?</summary><p>It's the same web interface, the same on-device catalog and the same features. The server underneath is a Swift port of the Android one, checked against it with tests. The iPhone build is newer and has had less real-device testing, so tell us if something misbehaves.</p></details>
     <details><summary>Where do the prices come from?</summary><p>tcgcsv.com, which republishes TCGplayer's catalog and market prices. Treat them as estimates; condition adjustments are approximate.</p></details>
     <details><summary>Is my data sent anywhere?</summary><p>No account exists, and your collection isn't uploaded. The app contacts tcgcsv.com if you sync prices, the TCGplayer image CDN to show card pictures, and this site when you tap "Check for updates". A live trade talks directly between the two phones on your network.</p></details>
   </section>
@@ -160,14 +169,16 @@ fetch("releases.json", { cache: "no-store" }).then((r) => r.json()).then((d) => 
   if (!list.length) throw new Error("none");
   const rows = list.map((r, i) => `<tr>
     <td><b>v${r.version}</b>${i === 0 ? '<span class="tag">latest</span>' : ""}<br><small style="color:var(--muted)">build ${r.versionCode ?? "?"}</small></td>
-    <td>${r.date ? fmtDate(r.date) : ""}</td><td>${fmtSize(r.size)}</td>
-    <td class="hash">${r.sha256}<button class="copy" data-h="${r.sha256}">copy</button></td>
-    <td><a href="${r.download}">APK</a> · <a href="${r.url}">notes</a></td></tr>`).join("");
+    <td>${r.date ? fmtDate(r.date) : ""}</td><td>${fmtSize(r.size)}${r.ipa ? `<br><small style="color:var(--muted)">iOS ${fmtSize(r.ipaSize)}</small>` : ""}</td>
+    <td class="hash"><small style="color:var(--muted)">APK</small> ${r.sha256}<button class="copy" data-h="${r.sha256}">copy</button>${r.ipa && r.ipaSha256 ? `<br><small style="color:var(--muted)">IPA</small> ${r.ipaSha256}<button class="copy" data-h="${r.ipaSha256}">copy</button>` : ""}</td>
+    <td><a href="${r.download}">APK</a>${r.ipa ? ` · <a href="${r.ipaDownload}">IPA</a>` : ""} · <a href="${r.url}">notes</a></td></tr>`).join("");
   document.getElementById("rel-rows").innerHTML = rows;
   const l = list[0];
   const dl = document.getElementById("hero-dl");
   dl.href = l.download; dl.textContent = `⬇ Download v${l.version} (${fmtSize(l.size)})`;
-  document.getElementById("hero-sub").textContent = `Latest: v${l.version}${l.date ? " · " + fmtDate(l.date) : ""} · Android 8.0+ · sideload (not on the Play Store) · installs over older versions and keeps your data`;
+  const ios = document.getElementById("hero-dl-ios");
+  if (l.ipa) { ios.href = l.ipaDownload; ios.textContent = `⬇ iPhone v${l.version} (${fmtSize(l.ipaSize)})`; ios.style.display = ""; }
+  document.getElementById("hero-sub").textContent = `Latest: v${l.version}${l.date ? " · " + fmtDate(l.date) : ""} · Android 8.0+${l.ipa ? " and iOS 15+" : ""} · sideload (not in the app stores) · installs over older versions and keeps your data`;
   document.querySelectorAll("button.copy").forEach((b) => b.addEventListener("click", () => { navigator.clipboard && navigator.clipboard.writeText(b.dataset.h); b.textContent = "copied"; setTimeout(() => (b.textContent = "copy"), 1200); }));
 }).catch(() => { document.getElementById("rel-rows").innerHTML = '<tr><td colspan="5">Couldn\'t load the list. See the <a href="https://github.com/unaveragetech/collectify-app/releases">releases page</a>.</td></tr>'; });
 </script>

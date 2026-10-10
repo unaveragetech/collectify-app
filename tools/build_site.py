@@ -5,7 +5,9 @@ Run from the repo root after publishing a release:
     python tools/build_site.py
 
 For every Collectify-vX.Y.Z.apk next to this repo it records the version, versionCode (read
-with aapt2), size, SHA-256 and the release date/notes (from `gh`). The app's "Check for
+with aapt2), size, SHA-256 and the release date/notes (from `gh`). If the release also carries an
+iOS build (Collectify-vX.Y.Z.ipa, attached by the "Build iOS" workflow) its size, SHA-256 and
+download link are recorded too (ipa, ipaSize, ipaSha256, ipaDownload). The app's "Check for
 updates" button and the website's download table both read docs/releases.json.
 """
 import glob
@@ -56,6 +58,29 @@ def gh_json(args):
         return None
 
 
+def ipa_info(tag, ver, prev):
+    """Size / checksum / link of the iOS build attached to a release, or {} if there is none."""
+    name = f"Collectify-v{ver}.ipa"
+    data = gh_json(["release", "view", tag, "-R", REPO, "--json", "assets"])
+    assets = {a["name"]: a for a in (data or {}).get("assets", [])}
+    if name not in assets:
+        return {k: prev[k] for k in ("ipa", "ipaSize", "ipaSha256", "ipaDownload") if k in prev and data is None}
+    size = assets[name]["size"]
+    digest = prev.get("ipaSha256") if prev.get("ipaSize") == size else None
+    if not digest and name + ".sha256" in assets:
+        try:
+            out = subprocess.run(["gh", "release", "download", tag, "-R", REPO, "-p", name + ".sha256", "-O", "-"], capture_output=True, text=True, timeout=60).stdout
+            digest = out.split()[0].lower() if out.strip() else None
+        except Exception:
+            digest = None
+    return {
+        "ipa": name,
+        "ipaSize": size,
+        "ipaSha256": digest,
+        "ipaDownload": f"https://github.com/{REPO}/releases/download/{tag}/{name}",
+    }
+
+
 def main():
     os.makedirs(DOCS, exist_ok=True)
     aapt2 = find_aapt2()
@@ -102,6 +127,7 @@ def main():
                 "url": f"https://github.com/{REPO}/releases/tag/{tag}",
                 "download": f"https://github.com/{REPO}/releases/download/{tag}/{os.path.basename(apk)}",
                 "notes": notes,
+                **ipa_info(tag, ver, prev),
             }
         )
     releases.sort(key=lambda r: tuple(int(x) for x in r["version"].split(".")), reverse=True)
