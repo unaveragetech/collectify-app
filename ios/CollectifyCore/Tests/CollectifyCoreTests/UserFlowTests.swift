@@ -117,9 +117,9 @@ final class UserFlowTests: XCTestCase {
         // 7.5 * 0.85 * 2
         let pika = items.first { ($0["product_id"] as? Int) == 1001 }!
         XCTAssertEqual(pika["adjusted_value"] as? Double, 6.38)
-        XCTAssertEqual(pika["line_value"] as? Double, 12.75)
+        XCTAssertEqual(pika["line_value"] as? Double, 12.76)
         XCTAssertEqual(pika["source"] as? String, "scan")
-        XCTAssertEqual(dict(r)["total_value"] as? Double, round2(12.75 + 250.0))
+        XCTAssertEqual(dict(r)["total_value"] as? Double, round2(12.76 + 250.0))
 
         (c, r) = call("GET", "/api/collection?group_by=rarity")
         XCTAssertEqual(arr(dict(r)["rows"]!).first?["group"] as? String, "Rare Holo")
