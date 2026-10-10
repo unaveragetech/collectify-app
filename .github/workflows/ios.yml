@@ -2,8 +2,12 @@ name: Build iOS
 
 # Builds the unsigned Collectify .ipa for a release that already exists (created with the Android APK).
 # Run it from the Actions tab, or:  gh workflow run ios.yml -f version=0.21.0 -f build=34 -f catalog=11
-# It tests the Swift core against the real catalog, builds the app, smoke-tests it in the iOS
-# Simulator and attaches Collectify-v<version>.ipa (+ .sha256) to the release v<version>-standalone.
+#
+# Two jobs run side by side:
+#   ipa        tests the Swift core against the real catalog, builds the app and attaches
+#              Collectify-v<version>.ipa (+ .sha256) to the release (a few minutes)
+#   simulator  boots the app in the iOS Simulator and drives it (slow, and never blocks the .ipa);
+#              its screenshots and results are uploaded as the "simulator-smoke" artifact
 on:
   workflow_dispatch:
     inputs:
@@ -20,20 +24,25 @@ on:
         description: "Release to read ios-www.zip from and attach the .ipa to (default: v<version>-standalone)"
         required: false
         default: ""
+      smoke:
+        description: "Also run the (slow) simulator smoke test"
+        type: boolean
+        default: true
 
 permissions:
   contents: write
 
+env:
+  GH_TOKEN: ${{ github.token }}
+  VERSION: ${{ inputs.version }}
+  BUILD: ${{ inputs.build }}
+  CATALOG: ${{ inputs.catalog }}
+  TAG: ${{ inputs.tag != '' && inputs.tag || format('v{0}-standalone', inputs.version) }}
+
 jobs:
-  ios:
+  ipa:
     runs-on: macos-15
-    timeout-minutes: 90
-    env:
-      GH_TOKEN: ${{ github.token }}
-      VERSION: ${{ inputs.version }}
-      BUILD: ${{ inputs.build }}
-      CATALOG: ${{ inputs.catalog }}
-      TAG: ${{ inputs.tag != '' && inputs.tag || format('v{0}-standalone', inputs.version) }}
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -47,7 +56,6 @@ jobs:
           gh release download "catalog-v${CATALOG}" -R "$GITHUB_REPOSITORY" -p collectify.db.gz -D "$RUNNER_TEMP"
           gunzip -c "$RUNNER_TEMP/collectify.db.gz" > ios/Resources/collectify.db
           echo "$CATALOG" > ios/Resources/catalog_version.txt
-          ls -la ios/Resources ios/Resources/www | head -30
 
       - name: Test the Swift core (against the real catalog)
         working-directory: ios/CollectifyCore
@@ -75,22 +83,55 @@ jobs:
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
             | tail -60
 
+      - name: Package the .ipa
+        run: |
+          set -euo pipefail
+          APP="ios/build/Build/Products/Release-iphoneos/Collectify.app"
+          test -d "$APP"
+          rm -rf "$RUNNER_TEMP/ipa" && mkdir -p "$RUNNER_TEMP/ipa/Payload"
+          cp -R "$APP" "$RUNNER_TEMP/ipa/Payload/"
+          (cd "$RUNNER_TEMP/ipa" && zip -qry "$GITHUB_WORKSPACE/Collectify-v${VERSION}.ipa" Payload)
+          shasum -a 256 "Collectify-v${VERSION}.ipa" | tee "Collectify-v${VERSION}.ipa.sha256"
+          ls -la "Collectify-v${VERSION}.ipa"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" -c "Print :CFBundleVersion" -c "Print :MinimumOSVersion" "$APP/Info.plist"
+
+      - name: Attach to the release
+        run: |
+          gh release upload "$TAG" "Collectify-v${VERSION}.ipa" "Collectify-v${VERSION}.ipa.sha256" -R "$GITHUB_REPOSITORY" --clobber
+
+  simulator:
+    if: ${{ inputs.smoke }}
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch the web UI and card catalog
+        run: |
+          set -euo pipefail
+          mkdir -p ios/Resources
+          gh release download "$TAG" -R "$GITHUB_REPOSITORY" -p ios-www.zip -D "$RUNNER_TEMP"
+          unzip -q -o "$RUNNER_TEMP/ios-www.zip" -d ios/Resources
+          gh release download "catalog-v${CATALOG}" -R "$GITHUB_REPOSITORY" -p collectify.db.gz -D "$RUNNER_TEMP"
+          gunzip -c "$RUNNER_TEMP/collectify.db.gz" > ios/Resources/collectify.db
+          echo "$CATALOG" > ios/Resources/catalog_version.txt
+
       - name: Smoke test in the iOS Simulator
-        continue-on-error: true
         working-directory: ios
         run: |
           set -o pipefail
           mkdir -p "$GITHUB_WORKSPACE/smoke"
+          brew install xcodegen && xcodegen generate
           xcodebuild build \
             -project Collectify.xcodeproj -scheme Collectify -configuration Debug \
             -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build-sim CODE_SIGNING_ALLOWED=NO > "$GITHUB_WORKSPACE/smoke/build.log" 2>&1 || { grep -E "error:" "$GITHUB_WORKSPACE/smoke/build.log" | sort -u | head -20; exit 1; }
           APP="build-sim/Build/Products/Debug-iphonesimulator/Collectify.app"
-          xcrun simctl list devices available | tee "$GITHUB_WORKSPACE/smoke/devices.txt" | head -30
+          xcrun simctl list devices available > "$GITHUB_WORKSPACE/smoke/devices.txt"
           UDID=$(grep -m1 -E "iPhone (1[5-9]|Air)" "$GITHUB_WORKSPACE/smoke/devices.txt" | grep -oE "[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}")
           echo "simulator $UDID"
           xcrun simctl boot "$UDID"
-          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl bootstatus "$UDID" -b > /dev/null
           xcrun simctl install "$UDID" "$APP"
           sleep 20
           for i in 1 2 3 4 5 6 7 8; do
@@ -130,12 +171,10 @@ jobs:
             shot "02-$t"
           done
           js "const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); return {webgl: !!gl, renderer: gl ? gl.getParameter(gl.VERSION) : null}" | tee -a "$GITHUB_WORKSPACE/smoke/env.json"
-          # Island Care: start a game and let the 3D scene render
           js "const b = document.querySelector('[data-isl=\"adopt0\"]'); if (b) b.click(); return !!b" | tee -a "$GITHUB_WORKSPACE/smoke/env.json"
           sleep 15
           shot 03-island-started
           js "return {errors: window.__errs, view: typeof islView !== 'undefined' && !!islView, stage: typeof islView !== 'undefined' && islView ? islView.stage() : null}" | tee -a "$GITHUB_WORKSPACE/smoke/env.json"
-          # a real card flow through the UI's own API: add a card to the default binder, read the page back
           js "const r = await fetch('/api/collection', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({product_id: 524060})}); const j = await r.json(); const p = await (await fetch('/api/binders/default/page')).json(); return {status: r.status, add: j, first: p.slots[0] && p.slots[0].name}" | tee -a "$GITHUB_WORKSPACE/smoke/env.json"
           js "document.querySelector('.tab[data-screen=\"binders\"]').click(); return 1" > /dev/null
           sleep 5
@@ -149,19 +188,3 @@ jobs:
           name: simulator-smoke
           path: smoke/
           if-no-files-found: ignore
-
-      - name: Package the .ipa
-        run: |
-          set -euo pipefail
-          APP="ios/build/Build/Products/Release-iphoneos/Collectify.app"
-          test -d "$APP"
-          rm -rf "$RUNNER_TEMP/ipa" && mkdir -p "$RUNNER_TEMP/ipa/Payload"
-          cp -R "$APP" "$RUNNER_TEMP/ipa/Payload/"
-          (cd "$RUNNER_TEMP/ipa" && zip -qry "$GITHUB_WORKSPACE/Collectify-v${VERSION}.ipa" Payload)
-          shasum -a 256 "Collectify-v${VERSION}.ipa" | tee "Collectify-v${VERSION}.ipa.sha256"
-          ls -la "Collectify-v${VERSION}.ipa"
-          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" -c "Print :CFBundleVersion" -c "Print :MinimumOSVersion" "$APP/Info.plist"
-
-      - name: Attach to the release
-        run: |
-          gh release upload "$TAG" "Collectify-v${VERSION}.ipa" "Collectify-v${VERSION}.ipa.sha256" -R "$GITHUB_REPOSITORY" --clobber
