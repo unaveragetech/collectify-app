@@ -72,6 +72,28 @@ final class VisitRoomTests: XCTestCase {
         XCTAssertEqual((room["events"] as! [JSON]).count, 0)
     }
 
+    func testHostPositionIsSharedAndPollsStaySmall() {
+        _ = visits.join(token: token, name: "Sam", client: "c1")
+        _ = visits.hostUpdate(token: token, body: ["client": "hc", "pos": ["x": 4.5, "z": -3, "ry": 2]])
+        var room = visits.get(token: token, since: nil, sv: nil, waitMs: 0, me: "c1")!
+        let h = room["host"] as! JSON
+        XCTAssertEqual(h["x"] as? Double, 4.5)
+        XCTAssertEqual(h["z"] as? Double, -3)
+        let v = room["v"] as? Int
+        _ = visits.hostUpdate(token: token, body: ["client": "hc", "pos": ["x": 4.5, "z": -3, "ry": 2]]) // no change
+        XCTAssertEqual(visits.get(token: token, since: nil, sv: nil, waitMs: 0, me: "c1")!["v"] as? Int, v)
+        _ = visits.act(token: token, body: ["client": "c1", "kind": "water", "data": [:] as JSON])
+        XCTAssertEqual((visits.get(token: token, since: nil, sv: nil, waitMs: 0, me: "c1")!["events"] as! [JSON]).count, 0)
+        XCTAssertEqual((visits.get(token: token, since: nil, sv: nil, waitMs: 0, me: "hc")!["events"] as! [JSON]).count, 1)
+        _ = visits.hostUpdate(token: token, body: ["client": "hc", "ack": [1], "results": ["1": ["ok": true], "2": ["ok": false]]])
+        room = visits.get(token: token, since: nil, sv: nil, waitMs: 0, me: "c1", rv: 1)!
+        XCTAssertEqual(Set((room["results"] as! JSON).keys), ["2"])
+        room = visits.get(token: token, since: nil, sv: nil, waitMs: 0, me: "c1", rv: 2)!
+        XCTAssertEqual((room["results"] as! JSON).count, 0)
+        for i in 0..<60 { _ = visits.hostUpdate(token: token, body: ["client": "hc", "feed": [["text": "line \(i)"]]]) }
+        XCTAssertLessThanOrEqual((visits.get(token: token, since: nil, sv: nil, waitMs: 0, me: "c1")!["feed"] as! [JSON]).count, 20)
+    }
+
     func testLeaving() {
         _ = visits.join(token: token, name: "Sam", client: "c1")
         XCTAssertEqual(visits.leave(token: token, body: ["client": "c1"]).0, 200)

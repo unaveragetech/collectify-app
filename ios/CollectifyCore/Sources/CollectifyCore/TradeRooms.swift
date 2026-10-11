@@ -283,7 +283,8 @@ public enum RoomRoutes {
             let since = req.query["v"].flatMap { Int($0) }
             let sv = req.query["sv"].flatMap { Int($0) }
             let waitMs = Int(((req.query["wait"].flatMap { Double($0) }) ?? 0) * 1000)
-            if let room = visits.get(token: token, since: since, sv: sv, waitMs: waitMs, me: req.query["me"]) { return json(200, room) }
+            let rv = req.query["r"].flatMap { Int($0) }
+            if let room = visits.get(token: token, since: since, sv: sv, waitMs: waitMs, me: req.query["me"], rv: rv) { return json(200, room) }
             return json(404, ["detail": "no such island visit"])
         }
         if parts.count == 3 && req.method == "POST" {

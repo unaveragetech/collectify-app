@@ -17,6 +17,8 @@ public final class VisitRooms {
     private let maxEvents = 300
     private let maxResults = 300
     private let feedMax = 40
+    private let feedSent = 20 // a poll carries only the newest lines
+    private let resultTTL: TimeInterval = 180 // an answer is only useful to its visitor for a short while
     private let kinds: Set<String> = ["water", "harvest", "feeddish", "waterdish", "pet", "feedmon", "collect", "forage", "gift", "donate", "note", "emote", "pos"]
 
     private final class Visitor {
@@ -49,6 +51,8 @@ public final class VisitRooms {
         var events = [Event]()
         var nextEid = 1
         var results = [Int: JSON]()
+        var resT = [Int: Date]()
+        var hostX = 1.0, hostZ = 7.2, hostRy = 0.0
         var feed = [JSON]()
         var touched = Date()
         init(token: String, hostName: String, hostClient: String) { self.token = token; self.hostName = hostName; self.hostClient = hostClient }
@@ -100,22 +104,24 @@ public final class VisitRooms {
         if r.feed.count > feedMax { r.feed.removeFirst(r.feed.count - feedMax) }
     }
 
-    private func publicJSON(_ r: Room, sv: Int?, me: String?) -> JSON {
+    private func publicJSON(_ r: Room, sv: Int?, me: String?, rv: Int? = nil) -> JSON {
+        let isVisitor = !(me ?? "").isEmpty && r.hostClient != me
         var out: JSON = [
             "token": r.token,
             "v": r.v,
             "stage": r.stage,
             "closed_by": orNull(r.closedBy),
             "max": VisitRooms.maxVisitors,
-            "host": ["name": r.hostName] as JSON,
+            "host": ["name": r.hostName, "x": r.hostX, "z": r.hostZ, "ry": r.hostRy] as JSON,
             "snap_v": r.snapV,
             "you": NSNull(),
             "visitors": r.visitors.map { ["id": $0.id, "name": $0.name, "x": $0.x, "z": $0.z, "ry": $0.ry] as JSON },
-            "events": r.events.map { ["id": $0.id, "vid": $0.vid, "name": $0.name, "kind": $0.kind, "data": $0.data] as JSON },
-            "feed": r.feed,
+            // only the host acts on requests: a visitor poll does not need them
+            "events": isVisitor ? [JSON]() : r.events.map { ["id": $0.id, "vid": $0.vid, "name": $0.name, "kind": $0.kind, "data": $0.data] as JSON },
+            "feed": Array(r.feed.suffix(feedSent)),
         ]
         var rs = JSON()
-        for (k, v) in r.results { rs[String(k)] = v }
+        for (k, v) in r.results where rv == nil || k > rv! { rs[String(k)] = v }
         out["results"] = rs
         if sv != r.snapV { out["snap"] = r.snap ?? NSNull() }
         if let me = me, !me.isEmpty {
@@ -125,7 +131,7 @@ public final class VisitRooms {
     }
 
     /// Returns nil if the room doesn't exist. Long-polls while `since` still matches.
-    public func get(token: String, since: Int?, sv: Int?, waitMs: Int, me: String?) -> JSON? {
+    public func get(token: String, since: Int?, sv: Int?, waitMs: Int, me: String?, rv: Int? = nil) -> JSON? {
         cond.lock()
         defer { cond.unlock() }
         guard var room = rooms[token] else { return nil }
@@ -135,7 +141,7 @@ public final class VisitRooms {
             guard let r = rooms[token] else { return nil }
             room = r
         }
-        return publicJSON(room, sv: sv, me: me)
+        return publicJSON(room, sv: sv, me: me, rv: rv)
     }
 
     public func join(token: String, name: String, client: String) -> (Int, JSON) {
@@ -211,6 +217,13 @@ public final class VisitRooms {
             room.hostName = String(name.prefix(24))
             dirty = true
         }
+        if let hp = body["pos"] as? JSON {
+            let nx = num(hp, "x", -60, 60), nz = num(hp, "z", -60, 60), nry = num(hp, "ry", -7, 7)
+            if abs(nx - room.hostX) + abs(nz - room.hostZ) + abs(nry - room.hostRy) > 0.02 {
+                room.hostX = nx; room.hostZ = nz; room.hostRy = nry
+                dirty = true
+            }
+        }
         if let ack = body["ack"] as? [Any], !ack.isEmpty {
             let ids = Set(ack.compactMap { jInt($0) })
             room.events.removeAll { ids.contains($0.id) }
@@ -220,7 +233,13 @@ public final class VisitRooms {
             for (k, val) in results {
                 guard let res = val as? JSON, let id = Int(k), jsonData(res).count <= maxEventBytes else { continue }
                 room.results[id] = res
+                room.resT[id] = Date()
                 dirty = true
+            }
+            let cut = Date().addingTimeInterval(-resultTTL)
+            for (id, t) in room.resT where t < cut {
+                room.results.removeValue(forKey: id)
+                room.resT.removeValue(forKey: id)
             }
             if room.results.count > maxResults {
                 for old in room.results.keys.sorted().prefix(room.results.count - maxResults) { room.results.removeValue(forKey: old) }
