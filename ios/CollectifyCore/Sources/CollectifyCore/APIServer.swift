@@ -59,6 +59,15 @@ public final class APIServer {
             return ok(try Match.gameSealed(db, categoryId: q["category_id"].flatMap { Int($0) }, q: q["q"] ?? "", kind: q["kind"] ?? "any",
                                            limit: min(q["limit"].flatMap { Int($0) } ?? 40, 80), offset: max(q["offset"].flatMap { Int($0) } ?? 0, 0)))
         }
+        if uri == "/api/game/vsealed" {
+            return ok(try VirtualPacks.packs(db, categoryId: q["category_id"].flatMap { Int($0) }, q: q["q"] ?? "",
+                                             limit: min(q["limit"].flatMap { Int($0) } ?? 40, 80), offset: max(q["offset"].flatMap { Int($0) } ?? 0, 0)))
+        }
+        if uri == "/api/game/games" { return ok(try VirtualPacks.games(db)) }
+        if uri.hasPrefix("/api/game/packart/") {
+            guard let gid = Int(uri.dropFirst("/api/game/packart/".count)), let svg = try VirtualPacks.packArt(db, groupId: gid) else { return .detail("not found", status: 404) }
+            return HTTPResponse(status: 200, contentType: "image/svg+xml", body: Data(svg.utf8), headers: ["Cache-Control": "public, max-age=86400"])
+        }
         if uri == "/api/game/pool" {
             guard let g = q["group_id"].flatMap({ Int($0) }) else { throw BadRequest("group_id required") }
             return ok(try Match.gamePool(db, groupId: g))
@@ -148,6 +157,7 @@ public final class APIServer {
 
     private func product(_ idStr: String) throws -> HTTPResponse {
         guard let productId = Int(idStr) else { throw BadRequest("bad product id") }
+        if let v = try VirtualPacks.product(db, productId: productId) { return ok(v) }
         guard let r = try db.query("""
             SELECT p.*, c.display_name AS category_name, g.name AS group_name
             FROM products p
@@ -360,6 +370,7 @@ public final class APIServer {
         do {
             let s = try Sync(db).syncCategory(cat)
             Match.clearCaches()
+            VirtualPacks.clearCache()
             return ok(["groups": s.groups, "products": s.products, "prices": s.prices, "errors": s.errors])
         } catch {
             lastSyncError = "\(error)"

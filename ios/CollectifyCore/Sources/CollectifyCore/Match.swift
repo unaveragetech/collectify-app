@@ -182,15 +182,15 @@ public enum Match {
         return best > 0 ? best : NSNull()
     }
 
-    private static let packClause = "((p.name LIKE '%Booster Pack%' OR p.name LIKE '%Celebration Pack%' OR p.name LIKE '%Anniversary Pack%') AND p.name NOT LIKE '%Case%' AND p.name NOT LIKE '%Box%' AND p.name NOT LIKE '%&%' AND p.name NOT LIKE '%Promo%' AND p.name NOT LIKE '%Portfolio%' AND p.name NOT LIKE '% Pin%' AND p.name NOT LIKE '%Bundle%' AND p.name NOT LIKE '%Display%' AND p.name NOT LIKE '%Blister%' AND p.name NOT LIKE '%Code Card%')"
+    static let packClauseSQL = "((p.name LIKE '%Booster Pack%' OR p.name LIKE '%Celebration Pack%' OR p.name LIKE '%Anniversary Pack%') AND p.name NOT LIKE '%Case%' AND p.name NOT LIKE '%Box%' AND p.name NOT LIKE '%&%' AND p.name NOT LIKE '%Promo%' AND p.name NOT LIKE '%Portfolio%' AND p.name NOT LIKE '% Pin%' AND p.name NOT LIKE '%Bundle%' AND p.name NOT LIKE '%Display%' AND p.name NOT LIKE '%Blister%' AND p.name NOT LIKE '%Code Card%')"
     private static let boxClause = "(p.name LIKE '%Booster Box%' AND p.name NOT LIKE '%Case%' AND p.name NOT LIKE '%&%' AND p.name NOT LIKE '%Promo%' AND p.name NOT LIKE '%Portfolio%' AND p.name NOT LIKE '% Pin%' AND p.name NOT LIKE '%Bundle%' AND p.name NOT LIKE '%Display%' AND p.name NOT LIKE '%Blister%' AND p.name NOT LIKE '%Code Card%')"
 
     public static func gameSealed(_ db: SQLiteDB, categoryId: Int?, q: String, kind: String, limit: Int, offset: Int) throws -> [JSON] {
         let clause: String
         switch kind {
-        case "pack": clause = packClause
+        case "pack": clause = packClauseSQL
         case "box": clause = boxClause
-        default: clause = "(\(packClause) OR \(boxClause))"
+        default: clause = "(\(packClauseSQL) OR \(boxClause))"
         }
         var whereSql = "p.number IS NULL AND p.image_url IS NOT NULL AND \(clause)"
         var args: [Any?] = []

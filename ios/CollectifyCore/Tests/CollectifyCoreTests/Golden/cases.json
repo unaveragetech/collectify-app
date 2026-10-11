@@ -112,5 +112,53 @@
   "body": null,
   "mode": "exact",
   "status": 200
+ },
+ {
+  "name": "game_games",
+  "method": "GET",
+  "path": "/api/game/games",
+  "body": null,
+  "mode": "exact",
+  "status": 200
+ },
+ {
+  "name": "game_vsealed_dice",
+  "method": "GET",
+  "path": "/api/game/vsealed?category_id=18&limit=6",
+  "body": null,
+  "mode": "exact",
+  "status": 200
+ },
+ {
+  "name": "game_vsealed_page2",
+  "method": "GET",
+  "path": "/api/game/vsealed?category_id=1&limit=5&offset=5",
+  "body": null,
+  "mode": "exact",
+  "status": 200
+ },
+ {
+  "name": "game_vsealed_query",
+  "method": "GET",
+  "path": "/api/game/vsealed?q=x-men&limit=5",
+  "body": null,
+  "mode": "exact",
+  "status": 200
+ },
+ {
+  "name": "product_generated",
+  "method": "GET",
+  "path": "/api/product/2000001594",
+  "body": null,
+  "mode": "exact",
+  "status": 200
+ },
+ {
+  "name": "packart",
+  "method": "GET",
+  "path": "/api/game/packart/1594",
+  "body": null,
+  "mode": "text",
+  "status": 200
  }
 ]

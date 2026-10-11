@@ -26,12 +26,16 @@ final class UserFlowTests: XCTestCase {
 
     func seed() throws {
         try db.exec("INSERT INTO categories(category_id, name, display_name, popularity) VALUES(3,'Pokemon','Pokemon',100),(1,'Magic','Magic: The Gathering',90)")
-        try db.exec("INSERT INTO groups(group_id, category_id, name, published_on) VALUES(100,3,'Base Set','1999-01-09'),(200,1,'Alpha','1993-08-05')")
+        try db.exec("INSERT INTO groups(group_id, category_id, name, published_on) VALUES(100,3,'Base Set','1999-01-09'),(101,3,'Jungle & Fossil Mix Of Long Words','1999-06-16'),(200,1,'Alpha','1993-08-05')")
+        try db.exec("INSERT INTO categories(category_id, name, display_name, popularity) VALUES(29,'Funko','Funko',5)")
+        try db.exec("INSERT INTO groups(group_id, category_id, name, published_on) VALUES(900,29,'Pops','2020-01-01')")
         let ins = "INSERT INTO products(product_id, group_id, category_id, name, clean_name, image_url, number, rarity) VALUES(?,?,?,?,?,?,?,?)"
         try db.exec(ins, [1001, 100, 3, "Pikachu", "Pikachu", "https://img/1001.jpg", "58/102", "Common"])
         try db.exec(ins, [1002, 100, 3, "Charizard", "Charizard", "https://img/1002.jpg", "4/102", "Rare Holo"])
         try db.exec(ins, [1003, 100, 3, "Base Set Booster Pack", "Base Set Booster Pack", "https://img/1003.jpg", nil, nil])
         for n in 0..<14 { try db.exec(ins, [1100 + n, 100, 3, "Filler Card \(n)", "Filler Card \(n)", "https://img/f\(n).jpg", "\(n + 10)/102", "Common"]) }
+        for n in 0..<14 { try db.exec(ins, [1300 + n, 101, 3, "Jungle Card \(n)", "Jungle Card \(n)", "https://img/j\(n).jpg", "\(n + 1)/64", n < 2 ? "Rare" : "Common"]) }
+        for n in 0..<14 { try db.exec(ins, [1500 + n, 900, 29, "Pop \(n)", "Pop \(n)", "https://img/p\(n).jpg", "\(n + 1)", "Common"]) }
         try db.exec(ins, [2001, 200, 1, "Black Lotus", "Black Lotus", "https://img/2001.jpg", "232", "Rare"])
         let pr = "INSERT INTO prices(product_id, sub_type_name, price_date, low_price, mid_price, high_price, market_price, captured_at) VALUES(?,?,?,?,?,?,?,?)"
         try db.exec(pr, [1001, "Normal", "2026-01-01", 1.0, 2.0, 3.0, 5.0, "2026-01-01T00:00:00Z"])
@@ -40,6 +44,7 @@ final class UserFlowTests: XCTestCase {
         try db.exec(pr, [1002, "Holofoil", "2026-02-01", 100.0, 200.0, 300.0, 250.0, "2026-02-01T00:00:00Z"])
         try db.exec(pr, [1003, "Normal", "2026-02-01", 3.0, 4.0, 5.0, 4.5, "2026-02-01T00:00:00Z"])
         try db.exec(pr, [2001, "Normal", "2026-02-01", 1000.0, 2000.0, 3000.0, 2500.0, "2026-02-01T00:00:00Z"])
+        for n in 0..<14 { try db.exec(pr, [1300 + n, "Normal", "2026-02-01", 1.0, 2.0, 3.0, 4.0, "2026-02-01T00:00:00Z"]) }
         try db.exec("INSERT INTO products_fts(products_fts) VALUES('rebuild')")
     }
 
@@ -94,12 +99,12 @@ final class UserFlowTests: XCTestCase {
 
     func testCategoriesAndStats() throws {
         var (c, r) = call("GET", "/api/categories")
-        XCTAssertEqual(arr(r).map { $0["category_id"] as? Int }, [3, 1]) // by popularity
+        XCTAssertEqual(arr(r).map { $0["category_id"] as? Int }, [3, 1, 29]) // by popularity
         (c, r) = call("GET", "/api/categories?search=magic")
         XCTAssertEqual(arr(r).count, 1)
         (c, r) = call("GET", "/api/stats")
-        XCTAssertEqual(dict(r)["categories"] as? Int, 2)
-        XCTAssertEqual(dict(r)["products"] as? Int, 18)
+        XCTAssertEqual(dict(r)["categories"] as? Int, 3)
+        XCTAssertEqual(dict(r)["products"] as? Int, 46)
         XCTAssertEqual(dict(r)["binders"] as? Int, 1)
     }
 
@@ -281,6 +286,45 @@ final class UserFlowTests: XCTestCase {
         XCTAssertEqual(c, 400)
     }
 
+    func testGeneratedPacks() throws {
+        // Base Set has a real sealed pack; Jungle has none -> a generated pack; Funko is not a card game
+        var (c, r) = call("GET", "/api/game/games")
+        XCTAssertEqual(c, 200)
+        let games = arr(r)
+        XCTAssertEqual(games.map { $0["category_id"] as? Int }, [3])
+        XCTAssertEqual(games[0]["sets"] as? Int, 2)
+        XCTAssertEqual(games[0]["generated_sets"] as? Int, 1)
+        (c, r) = call("GET", "/api/game/vsealed?category_id=3")
+        XCTAssertEqual(arr(r).count, 1)
+        let p = arr(r)[0]
+        XCTAssertEqual(p["product_id"] as? Int, 2_000_000_101)
+        XCTAssertEqual(p["name"] as? String, "Jungle & Fossil Mix Of Long Words Booster Pack")
+        XCTAssertEqual(p["virtual"] as? Bool, true)
+        XCTAssertEqual(p["price"] as? Double, 10.0) // 4.0 average market * 2.5
+        XCTAssertEqual(p["image_url"] as? String, "/api/game/packart/101")
+        XCTAssertEqual(p["card_count"] as? Int, 14)
+        (c, r) = call("GET", "/api/game/vsealed?category_id=1")
+        XCTAssertEqual(arr(r).count, 0)
+        (c, r) = call("GET", "/api/game/vsealed?q=fossil")
+        XCTAssertEqual(arr(r).count, 1)
+        (c, r) = call("GET", "/api/product/2000000101")
+        XCTAssertEqual(c, 200)
+        XCTAssertEqual(dict(r)["group_id"] as? Int, 101)
+        XCTAssertEqual((dict(r)["latest_prices"] as? [JSON])?.first?["market_price"] as? Double, 10.0)
+        (c, r) = call("GET", "/api/product/2000000999")
+        XCTAssertEqual(c, 404)
+        // the wrapper image
+        let art = api.handle(HTTPRequest(method: "GET", path: "/api/game/packart/101"))
+        XCTAssertEqual(art.status, 200)
+        XCTAssertEqual(art.contentType, "image/svg+xml")
+        XCTAssertTrue(art.text.contains("BOOSTER PACK"))
+        XCTAssertTrue(art.text.contains("Jungle &amp;"))
+        XCTAssertEqual(api.handle(HTTPRequest(method: "GET", path: "/api/game/packart/424242")).status, 404)
+        // its cards can be opened
+        (c, r) = call("GET", "/api/game/pool?group_id=101")
+        XCTAssertEqual(arr(r).count, 14)
+    }
+
     func testStaticAssets() throws {
         let www = dir.appendingPathComponent("www")
         try FileManager.default.createDirectory(at: www.appendingPathComponent("vendor"), withIntermediateDirectories: true)
@@ -362,7 +406,7 @@ final class UserFlowTests: XCTestCase {
         wait(for: [ex], timeout: 10)
         XCTAssertEqual(gotStatus, 200)
         let o = try JSONSerialization.jsonObject(with: body) as! JSON
-        XCTAssertEqual(o["products"] as? Int, 18)
+        XCTAssertEqual(o["products"] as? Int, 46)
 
         // a POST with a body
         let ex2 = expectation(description: "post")

@@ -22,7 +22,8 @@ def call(method, path, body=None):
     data = json.dumps(body).encode() if body is not None else None
     req = urllib.request.Request(base + path, data=data, method=method, headers={"Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=300) as r:
-        return r.status, json.loads(r.read().decode())
+        raw = r.read().decode()
+        return r.status, (json.loads(raw) if "json" in (r.headers.get("Content-Type") or "") else raw)
 
 
 cases = [
@@ -39,12 +40,23 @@ cases = [
     ("game_sealed_box", "GET", "/api/game/sealed?kind=box&limit=3", None, "exact"),
     ("game_sealed_query", "GET", "/api/game/sealed?q=base%20set&kind=pack&limit=3", None, "exact"),
     ("game_pool", "GET", "/api/game/pool?group_id=604", None, "exact"),
+    # generated packs for sets that have no sealed booster pack
+    ("game_games", "GET", "/api/game/games", None, "exact"),
+    ("game_vsealed_dice", "GET", "/api/game/vsealed?category_id=18&limit=6", None, "exact"),
+    ("game_vsealed_page2", "GET", "/api/game/vsealed?category_id=1&limit=5&offset=5", None, "exact"),
+    ("game_vsealed_query", "GET", "/api/game/vsealed?q=x-men&limit=5", None, "exact"),
+    ("product_generated", "GET", "/api/product/2000001594", None, "exact"),
+    ("packart", "GET", "/api/game/packart/1594", None, "text"),
 ]
 index = []
 for name, method, path, body, mode in cases:
     status, data = call(method, path, body)
-    with open(os.path.join(out, name + ".json"), "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+    if mode == "text":
+        with open(os.path.join(out, name + ".txt"), "w", encoding="utf-8", newline="") as f:
+            f.write(data)
+    else:
+        with open(os.path.join(out, name + ".json"), "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
     n = len(data) if isinstance(data, (list, dict)) else 1
     print(f"{name:26} {status} {n} items")
     index.append({"name": name, "method": method, "path": path, "body": body, "mode": mode, "status": status})

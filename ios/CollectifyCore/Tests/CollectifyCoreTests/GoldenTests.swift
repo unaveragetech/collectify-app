@@ -57,7 +57,6 @@ final class GoldenTests: XCTestCase {
         XCTAssertFalse(cases.isEmpty)
         var failures = [String]()
         for c in cases {
-            let expected = try JSONSerialization.jsonObject(with: Data(contentsOf: goldenDir.appendingPathComponent(c.name + ".json")), options: [.fragmentsAllowed])
             let (path, query) = HTTPRequest.parseTarget(c.path)
             let body = c.body.map { jsonData($0.value) } ?? Data()
             let resp = api.handle(HTTPRequest(method: c.method, path: path, query: query, body: body))
@@ -65,6 +64,12 @@ final class GoldenTests: XCTestCase {
                 failures.append("\(c.name): HTTP \(resp.status) \(resp.text.prefix(200))")
                 continue
             }
+            if c.mode == "text" {
+                let want = try String(contentsOf: goldenDir.appendingPathComponent(c.name + ".txt"), encoding: .utf8)
+                if want != resp.text { failures.append("\(c.name) [text]: differs\n  expected: \(want.prefix(400))\n  got:      \(resp.text.prefix(400))") }
+                continue
+            }
+            let expected = try JSONSerialization.jsonObject(with: Data(contentsOf: goldenDir.appendingPathComponent(c.name + ".json")), options: [.fragmentsAllowed])
             let actual = try JSONSerialization.jsonObject(with: resp.body, options: [.fragmentsAllowed])
             if let why = compare(expected, actual, mode: c.mode) { failures.append("\(c.name) [\(c.mode)]: \(why)") }
         }
