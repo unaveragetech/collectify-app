@@ -47,6 +47,15 @@ cases = [
     ("game_vsealed_query", "GET", "/api/game/vsealed?q=x-men&limit=5", None, "exact"),
     ("product_generated", "GET", "/api/product/2000001594", None, "exact"),
     ("packart", "GET", "/api/game/packart/1594", None, "text"),
+    # mixed packs (games with fewer than 10 sets) and the My Little Pony cards imported from another source
+    ("game_vsealed_mixed", "GET", "/api/game/vsealed?category_id=36&limit=10", None, "exact"),
+    ("game_vsealed_mixed_paging", "GET", "/api/game/vsealed?category_id=76&limit=5&offset=3", None, "exact"),
+    ("game_pool_mixed", "GET", "/api/game/pool?group_id=2100003601", None, "exact"),
+    ("product_mixed", "GET", "/api/product/2100003601", None, "exact"),
+    ("packart_mixed", "GET", "/api/game/packart/2100003601", None, "text"),
+    ("game_sealed_mlp", "GET", "/api/game/sealed?category_id=38&kind=pack&limit=10", None, "exact"),
+    ("game_pool_mlp", "GET", "/api/game/pool?group_id=2003", None, "exact"),
+    ("game_vsealed_mlp", "GET", "/api/game/vsealed?category_id=38&limit=10", None, "exact"),
 ]
 index = []
 for name, method, path, body, mode in cases:

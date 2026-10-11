@@ -70,6 +70,10 @@ public final class APIServer {
         }
         if uri == "/api/game/pool" {
             guard let g = q["group_id"].flatMap({ Int($0) }) else { throw BadRequest("group_id required") }
+            if g >= VirtualPacks.mixBase {
+                guard let pool = try VirtualPacks.mixedPool(db, groupId: g) else { return .detail("pack not found", status: 404) }
+                return ok(pool)
+            }
             return ok(try Match.gamePool(db, groupId: g))
         }
         if uri == "/api/scan/names" {

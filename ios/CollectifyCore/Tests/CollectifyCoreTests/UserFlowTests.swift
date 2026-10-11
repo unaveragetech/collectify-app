@@ -294,8 +294,11 @@ final class UserFlowTests: XCTestCase {
         XCTAssertEqual(games.map { $0["category_id"] as? Int }, [3])
         XCTAssertEqual(games[0]["sets"] as? Int, 2)
         XCTAssertEqual(games[0]["generated_sets"] as? Int, 1)
+        // a game with fewer than 10 sets gets mixed packs up to 10: 2 sets + 8 mixed
+        XCTAssertEqual(games[0]["mixed"] as? Int, 8)
+        XCTAssertEqual(games[0]["packs"] as? Int, 10)
         (c, r) = call("GET", "/api/game/vsealed?category_id=3")
-        XCTAssertEqual(arr(r).count, 1)
+        XCTAssertEqual(arr(r).count, 9) // the Jungle set pack, then 8 mixed packs
         let p = arr(r)[0]
         XCTAssertEqual(p["product_id"] as? Int, 2_000_000_101)
         XCTAssertEqual(p["name"] as? String, "Jungle & Fossil Mix Of Long Words Booster Pack")
@@ -325,6 +328,37 @@ final class UserFlowTests: XCTestCase {
         XCTAssertEqual(arr(r).count, 14)
     }
 
+    func testMixedPacks() throws {
+        var (c, r) = call("GET", "/api/game/vsealed?category_id=3")
+        let mixed = arr(r).dropFirst()
+        XCTAssertEqual(mixed.map { $0["product_id"] as? Int }, (1...8).map { 2_100_000_300 + $0 })
+        XCTAssertEqual(mixed.first?["name"] as? String, "Pokemon Mixed Pack 1")
+        XCTAssertEqual(mixed.first?["card_count"] as? Int, 8)
+        XCTAssertEqual(mixed.first?["virtual"] as? Bool, true)
+        // paging continues into the mixed packs
+        (c, r) = call("GET", "/api/game/vsealed?category_id=3&limit=3&offset=2")
+        XCTAssertEqual(arr(r).map { $0["product_id"] as? Int }, [2_100_000_302, 2_100_000_303, 2_100_000_304])
+        // every mixed pack has cards to open, all from the game, and a product page and wrapper
+        for id in 2_100_000_301...2_100_000_308 {
+            (c, r) = call("GET", "/api/game/pool?group_id=\(id)")
+            XCTAssertEqual(c, 200)
+            XCTAssertEqual(arr(r).count, 8)
+            XCTAssertTrue(arr(r).allSatisfy { ($0["category_id"] as? Int) == 3 })
+            (c, r) = call("GET", "/api/product/\(id)")
+            XCTAssertEqual(c, 200)
+            XCTAssertEqual(dict(r)["group_id"] as? Int, id)
+            XCTAssertEqual(api.handle(HTTPRequest(method: "GET", path: "/api/game/packart/\(id)")).status, 200)
+        }
+        // the windows are not all the same cards
+        let first = Set(arr(call("GET", "/api/game/pool?group_id=2100000301").1).compactMap { $0["product_id"] as? Int })
+        let last = Set(arr(call("GET", "/api/game/pool?group_id=2100000308").1).compactMap { $0["product_id"] as? Int })
+        XCTAssertNotEqual(first, last)
+        (c, r) = call("GET", "/api/game/pool?group_id=2100000399")
+        XCTAssertEqual(c, 404)
+        (c, r) = call("GET", "/api/product/2100000399")
+        XCTAssertEqual(c, 404)
+    }
+
     func testUnnumberedCardSets() throws {
         // Some games (Sorcery ...) list their cards without a collector number, only a rarity. A set with too few
         // numbered cards counts those, unless the name looks like sealed product; tiny sets and sealed items never do.
@@ -342,7 +376,8 @@ final class UserFlowTests: XCTestCase {
         (c, r) = call("GET", "/api/game/pool?group_id=301")
         XCTAssertEqual(arr(r).count, 3)
         (c, r) = call("GET", "/api/game/vsealed?category_id=77")
-        XCTAssertEqual(arr(r).map { $0["group_id"] as? Int }, [300])
+        XCTAssertEqual(arr(r).count, 10) // the Gothic set pack + 9 mixed packs
+        XCTAssertEqual(arr(r)[0]["group_id"] as? Int, 300)
         XCTAssertEqual(arr(r)[0]["card_count"] as? Int, 10)
         // a set with eight or more numbered cards keeps using only those
         (c, r) = call("GET", "/api/game/pool?group_id=101")

@@ -258,16 +258,25 @@ public enum Match {
     }
 
     public static func gamePool(_ db: SQLiteDB, groupId: Int) throws -> [JSON] {
+        try pool(db, where: "p.group_id = ? AND \(poolCardSQL)", args: [groupId])
+    }
+
+    /// The cards of a mixed pack: an explicit list of products.
+    public static func gamePoolIds(_ db: SQLiteDB, ids: [Int]) throws -> [JSON] {
+        try pool(db, where: "p.product_id IN (\(ids.map { _ in "?" }.joined(separator: ",")))", args: ids)
+    }
+
+    private static func pool(_ db: SQLiteDB, where whereSql: String, args: [Any?]) throws -> [JSON] {
         let rows = try db.query("""
             SELECT p.product_id, p.name, p.number, p.rarity, p.image_url, p.category_id, p.group_id,
                    g.name AS group_name, c.display_name AS category_name
             FROM products p
             JOIN groups g ON g.group_id = p.group_id
             JOIN categories c ON c.category_id = p.category_id
-            WHERE p.group_id = ? AND \(poolCardSQL)
+            WHERE \(whereSql)
             ORDER BY p.product_id
             LIMIT 900
-            """, [groupId])
+            """, args)
         var arr: [JSON] = rows.map { r in
             [
                 "product_id": r.int("product_id"),

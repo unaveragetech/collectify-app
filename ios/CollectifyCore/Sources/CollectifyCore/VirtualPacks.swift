@@ -5,6 +5,24 @@ import Foundation
 /// VirtualPacks.kt / collectify/virtual_packs.py: keep the rules, ids and prices identical.
 public enum VirtualPacks {
     public static let base = 2_000_000_000
+
+    // Games with fewer than minPacks sets get "mixed packs" so there are at least that many packs to open (see
+    // collectify/virtual_packs.py): pack k of K draws on a window of the game's cards. Their ids are
+    // mixBase + category_id * 100 + k, and that same number is the pack's group_id for /api/game/pool.
+    public static let mixBase = 2_100_000_000
+    private static let minPacks = 10
+    private static let mixMaxCards = 600
+
+    struct Mixed {
+        let productId: Int
+        let categoryId: Int
+        let categoryName: String?
+        let popularity: Int
+        let k: Int
+        let cardCount: Int
+        let ids: [Int]
+        var name: String { "\(categoryName ?? "") Mixed Pack \(k)" }
+    }
     private static let excluded = [29, 31, 32, 35] // Funko, Card Sleeves, Deck Boxes, Playmats
 
     struct VGroup {
@@ -20,11 +38,69 @@ public enum VirtualPacks {
 
     private static let lock = NSLock()
     private static var cache = [String: [VGroup]]()
+    private static var mixedCache = [String: [Mixed]]()
 
     public static func clearCache() {
         lock.lock()
         cache.removeAll()
+        mixedCache.removeAll()
         lock.unlock()
+    }
+
+    private static func mixed(_ db: SQLiteDB) throws -> [Mixed] {
+        lock.lock()
+        if let c = mixedCache[db.path] {
+            lock.unlock()
+            return c
+        }
+        lock.unlock()
+        var byCat = [Int: [VGroup]]()
+        for g in try groups(db) { byCat[g.categoryId, default: []].append(g) }
+        var out = [Mixed]()
+        for cat in byCat.keys.sorted() {
+            let gs = byCat[cat]!
+            if gs.count >= minPacks { continue }
+            var cards = [Int]()
+            for g in gs {
+                for r in try db.query("SELECT p.product_id FROM products p WHERE p.group_id = ? AND \(Match.poolCardSQL) ORDER BY p.product_id LIMIT 900", [g.groupId]) {
+                    cards.append(r.int("product_id"))
+                }
+            }
+            let n = cards.count
+            if n < Match.minSetCards { continue }
+            let kTotal = minPacks - gs.count
+            let w = Swift.max(Match.minSetCards, Swift.min(Swift.min(n, mixMaxCards), (2 * n + kTotal - 1) / kTotal))
+            for i in 0..<kTotal {
+                let s = (i * n) / kTotal
+                let ids = (0..<w).map { cards[(s + $0) % n] }.sorted()
+                out.append(Mixed(productId: mixBase + cat * 100 + (i + 1), categoryId: cat, categoryName: gs[0].categoryName, popularity: gs[0].popularity, k: i + 1, cardCount: w, ids: ids))
+            }
+        }
+        lock.lock()
+        mixedCache[db.path] = out
+        lock.unlock()
+        return out
+    }
+
+    static func mixedById(_ db: SQLiteDB, _ productId: Int) throws -> Mixed? {
+        try mixed(db).first(where: { $0.productId == productId })
+    }
+
+    public static func mixedPool(_ db: SQLiteDB, groupId: Int) throws -> [JSON]? {
+        guard let m = try mixedById(db, groupId) else { return nil }
+        return try Match.gamePoolIds(db, ids: m.ids)
+    }
+
+    private static func priceIds(_ db: SQLiteDB, _ ids: [Int]) throws -> Double {
+        let r = try db.query("""
+            SELECT AVG(m) AS a FROM (
+              SELECT MAX(pr.market_price) AS m FROM products p JOIN prices pr ON pr.product_id = p.product_id
+              WHERE p.product_id IN (\(ids.map { _ in "?" }.joined(separator: ","))) AND pr.market_price IS NOT NULL
+                AND pr.price_date = (SELECT MAX(price_date) FROM prices WHERE product_id = pr.product_id AND sub_type_name = pr.sub_type_name)
+              GROUP BY p.product_id)
+            """, ids).first
+        guard let avg = r?.doubleOrNil("a") else { return 2.5 }
+        return round2(Swift.min(45.0, Swift.max(1.5, avg * 2.5)))
     }
 
     private static func groups(_ db: SQLiteDB) throws -> [VGroup] {
@@ -80,13 +156,16 @@ public enum VirtualPacks {
             by[g.categoryId]!.sets += 1
             if !g.hasReal { by[g.categoryId]!.gen += 1 }
         }
+        var mixedBy = [Int: Int]()
+        for m in try mixed(db) { mixedBy[m.categoryId, default: 0] += 1 }
         let list = order.enumerated().map { ($0.offset, by[$0.element]!) }
         return list.sorted { a, b in
             if a.1.pop != b.1.pop { return a.1.pop > b.1.pop }
             let an = a.1.name ?? "", bn = b.1.name ?? ""
             return an != bn ? an < bn : a.0 < b.0
         }.map { _, a in
-            ["category_id": a.id, "name": orNull(a.name), "popularity": a.pop, "sets": a.sets, "generated_sets": a.gen] as JSON
+            let mx = mixedBy[a.id] ?? 0
+            return ["category_id": a.id, "name": orNull(a.name), "popularity": a.pop, "sets": a.sets, "generated_sets": a.gen, "mixed": mx, "packs": a.sets + mx] as JSON
         }
     }
 
@@ -94,6 +173,9 @@ public enum VirtualPacks {
         let toks = Match.tokenize(q).take(4)
         let list = try groups(db).filter { g in
             !g.hasReal && (categoryId == nil || g.categoryId == categoryId) && toks.allSatisfy { "\(g.name) \(g.categoryName ?? "")".lowercased().contains($0) }
+        }
+        let mixedList = try mixed(db).filter { m in
+            (categoryId == nil || m.categoryId == categoryId) && toks.allSatisfy { "\(m.name) mixed".lowercased().contains($0) }
         }
         var out = [JSON]()
         for g in list.dropFirst(offset).prefix(limit) {
@@ -112,11 +194,50 @@ public enum VirtualPacks {
                 "price": try price(db, g.groupId),
             ])
         }
+        // the mixed packs follow the set packs (so they page in after them)
+        let room = limit - out.count
+        let first = Swift.max(0, offset - list.count)
+        if room > 0 {
+            for m in mixedList.dropFirst(first).prefix(room) {
+                out.append([
+                    "product_id": m.productId,
+                    "name": m.name,
+                    "image_url": "/api/game/packart/\(m.productId)",
+                    "group_id": m.productId,
+                    "group_name": "Mixed Pack \(m.k)",
+                    "published_on": NSNull(),
+                    "category_id": m.categoryId,
+                    "category_name": orNull(m.categoryName),
+                    "card_count": m.cardCount,
+                    "kind": "pack",
+                    "virtual": true,
+                    "price": try priceIds(db, m.ids),
+                ])
+            }
+        }
         return out
     }
 
     public static func product(_ db: SQLiteDB, productId: Int) throws -> JSON? {
         if productId < base { return nil }
+        if productId >= mixBase {
+            guard let m = try mixedById(db, productId) else { return nil }
+            let lp: JSON = ["sub_type_name": "Sealed Pack", "market_price": try priceIds(db, m.ids), "low_price": NSNull(), "mid_price": NSNull(), "high_price": NSNull(), "price_date": NSNull()]
+            return [
+                "product_id": productId,
+                "name": m.name,
+                "clean_name": m.name,
+                "number": NSNull(), "rarity": NSNull(), "artist": NSNull(), "rules_text": NSNull(),
+                "category_id": m.categoryId,
+                "group_id": productId,
+                "image_url": "/api/game/packart/\(productId)",
+                "url": NSNull(),
+                "category_name": orNull(m.categoryName),
+                "group_name": "Mixed Pack \(m.k)",
+                "price_history": [Any](),
+                "latest_prices": [lp],
+            ]
+        }
         let gid = productId - base
         guard let g = try groups(db).first(where: { $0.groupId == gid }) else { return nil }
         let lp: JSON = ["sub_type_name": "Sealed Pack", "market_price": try price(db, gid), "low_price": NSNull(), "mid_price": NSNull(), "high_price": NSNull(), "price_date": NSNull()]
@@ -162,9 +283,15 @@ public enum VirtualPacks {
 
     /// A foil booster-pack wrapper for a set (no external images, so it works offline).
     public static func packArt(_ db: SQLiteDB, groupId: Int) throws -> String? {
-        guard let r = try db.query("SELECT g.name, g.category_id, c.display_name FROM groups g JOIN categories c ON c.category_id = g.category_id WHERE g.group_id = ?", [groupId]).first else { return nil }
-        let name = r.string("name"), cat = r.int("category_id"), catName = r.stringOrNil("display_name") ?? ""
-        let h = (cat * 47 + groupId * 13) % 360
+        var name = "", cat = 0, catName = "", hueKey = groupId
+        if groupId >= mixBase {
+            guard let m = try mixedById(db, groupId) else { return nil }
+            name = "Mixed Pack \(m.k)"; cat = m.categoryId; catName = m.categoryName ?? ""; hueKey = m.k
+        } else {
+            guard let r = try db.query("SELECT g.name, g.category_id, c.display_name FROM groups g JOIN categories c ON c.category_id = g.category_id WHERE g.group_id = ?", [groupId]).first else { return nil }
+            name = r.string("name"); cat = r.int("category_id"); catName = r.stringOrNil("display_name") ?? ""
+        }
+        let h = (cat * 47 + hueKey * 13) % 360
         let lines = wrapName(name)
         let longest = lines.map { $0.count }.max() ?? 1
         let size = longest <= 9 ? 36 : longest <= 11 ? 30 : longest <= 14 ? 25 : 21
