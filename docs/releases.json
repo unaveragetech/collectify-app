@@ -3,6 +3,22 @@
   "site": "https://unaveragetech.github.io/collectify-app/",
   "releases": [
     {
+      "version": "0.22.0",
+      "versionCode": 36,
+      "tag": "v0.22.0-standalone",
+      "date": "2026-10-11T00:12:11Z",
+      "apk": "Collectify-v0.22.0.apk",
+      "size": 94333881,
+      "sha256": "eb2244edeb35fe9cc1e693f02bbbcb4f1d8025d44ecf91b6b0baa7b04e379cc7",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.22.0-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.22.0-standalone/Collectify-v0.22.0.apk",
+      "notes": "## Collectify 0.22.0 — a pack for every set of every game\n\nAndroid `.apk` and iPhone/iPad `.ipa`, same version, same features.\n\nYou can now mine and open a booster pack from **any card game in the catalog**, as long as you have the coins.\n\n- **51 games, 3,300 sets.** Before, only sets that happened to have a \"Booster Pack\" product listed could be mined: 1,515 sets across the games that list one, and nothing at all for Dice Masters, Chrono Clash System and Kryptik TCG (and no packs for around half the sets of Magic, Yu-Gi-Oh!, Pokémon, Cardfight Vanguard and others). Now every set with at least 12 cards with pictures gets a pack of its own: **1,785 new packs**.\n- **Real packs are still used where they exist.** The Pick packs list shows a game's real sealed packs first, then the generated ones. Generated packs have their own foil wrapper in a colour drawn from the set and game (no internet needed), are named \"<Set> Booster Pack\", and open into 10 cards from that set.\n- **Price and difficulty:** a generated pack is priced from the set's own cards (2.5× their average market price, between $1.50 and $45), so a pack of a cheap set sits in soft rock and a valuable set in hard rock, like a real pack. It costs the same coins to claim.\n- **Every game in the pickers.** The Pick packs menu, the free daily pack (new *More games…* menu) and Mystery Blocks now list every game, not just the nine that were hard-coded, and the daily pack falls back to generated packs for games with few real ones.\n- **They work everywhere a pack does:** your packs inventory, stacking, trading unopened packs, Auto-queue, the 10-per-set daily purchase limit and prestige features all treat them like any other pack.\n- **Better pulls in games with poor rarity data:** some games list no usable rarity. Their packs now rank cards by price instead, so they still have commons and a few chase cards.\n- Not included: generated *boxes* (boxes still need a real \"Booster Box\" product), and accessories such as sleeves, deck boxes, playmats and Funko, which aren't card games.\n\n### Tested, and what wasn't\n- Checked in a desktop browser against the full catalog: every one of the 51 games offers a pack that rolls 10 cards; the new picker, the daily pack and Mystery lists work; the generated wrapper renders.\n- The Android, iPhone and desktop servers answer the new requests identically (the iPhone code is tested against answers recorded from the Android server, including the wrapper images).\n- Not tested on a phone, and not every one of the 3,300 sets was opened one by one: a handful of unusual sets may have odd rarity data.\n",
+      "ipa": "Collectify-v0.22.0.ipa",
+      "ipaSize": 89699717,
+      "ipaSha256": "82644b34ff34b8d0d675c0042013122be5e3985dc4fd4a5cbc5602375cf4df5e",
+      "ipaDownload": "https://github.com/unaveragetech/collectify-app/releases/download/v0.22.0-standalone/Collectify-v0.22.0.ipa"
+    },
+    {
       "version": "0.21.1",
       "versionCode": 35,
       "tag": "v0.21.1-standalone",
