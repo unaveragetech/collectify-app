@@ -1,6 +1,6 @@
 # Collectify (Android and iPhone)
 
-**Website:** https://unaveragetech.github.io/collectify-app/ - what the app does, its goals and approach, and the SHA-256 of every release. In the app, ℹ️ → *Check for updates* compares your install with that list.
+**Website:** https://unaveragetech.github.io/collectify-app/ - [features](https://unaveragetech.github.io/collectify-app/features.html), [step-by-step install guides for Android and iPhone](https://unaveragetech.github.io/collectify-app/install.html) (with troubleshooting), the [changelog](https://unaveragetech.github.io/collectify-app/changelog.html) and the SHA-256 of every release. In the app, ℹ️ → *Check for updates* compares your install with that list.
 
 Sideloadable builds of the Collectify app for Android (`.apk`) and iPhone / iPad (`.ipa`): a WebView shell around the
 [Collectify](https://github.com/unaveragetech/collectify) web app - card
@@ -9,6 +9,8 @@ across every TCG on tcgcsv.com. The full card catalog is bundled, so it works
 offline.
 
 ## Install on Android
+
+> Full walkthrough with troubleshooting: **[install.html](https://unaveragetech.github.io/collectify-app/install.html#android)**.
 
 1. Download the latest `Collectify-vX.Y.Z.apk` from [Releases](../../releases)
    (about 80 MB). Wait for the download to finish before opening it.
@@ -24,6 +26,8 @@ trade history, as long as the build is signed with the same key (all
 `Collectify-v0.11.1` and newer files are).
 
 ## Install on iPhone / iPad (iOS 15 or newer)
+
+> Full walkthrough (Sideloadly, AltStore, TrollStore; trust, Developer Mode, weekly refresh, problems): **[install.html](https://unaveragetech.github.io/collectify-app/install.html#iphone)**.
 
 Every release also carries `Collectify-vX.Y.Z.ipa` (about 90 MB): the same app, the same version
 number, built from the same web interface. It is **not signed** and not in the App Store, so

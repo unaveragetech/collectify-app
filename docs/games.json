@@ -1,0 +1,326 @@
+[
+{
+"name": "Magic: The Gathering",
+"sets": 440,
+"cards": 105466,
+"packs": true
+},
+{
+"name": "YuGiOh",
+"sets": 613,
+"cards": 46532,
+"packs": true
+},
+{
+"name": "Weiss Schwarz",
+"sets": 169,
+"cards": 31209,
+"packs": true
+},
+{
+"name": "Pokemon",
+"sets": 213,
+"cards": 28054,
+"packs": true
+},
+{
+"name": "Pokemon Japan",
+"sets": 410,
+"cards": 27920,
+"packs": true
+},
+{
+"name": "Cardfight Vanguard",
+"sets": 267,
+"cards": 26088,
+"packs": true
+},
+{
+"name": "Force of Will",
+"sets": 102,
+"cards": 13716,
+"packs": true
+},
+{
+"name": "Dragon Ball Super: Masters",
+"sets": 100,
+"cards": 11591,
+"packs": true
+},
+{
+"name": "Flesh and Blood TCG",
+"sets": 105,
+"cards": 10484,
+"packs": true
+},
+{
+"name": "Digimon Card Game",
+"sets": 100,
+"cards": 9379,
+"packs": true
+},
+{
+"name": "Star Wars: Unlimited",
+"sets": 31,
+"cards": 8964,
+"packs": true
+},
+{
+"name": "UniVersus",
+"sets": 60,
+"cards": 8264,
+"packs": true
+},
+{
+"name": "Heroclix",
+"sets": 183,
+"cards": 7995,
+"packs": true
+},
+{
+"name": "Future Card BuddyFight",
+"sets": 96,
+"cards": 7625,
+"packs": true
+},
+{
+"name": "Shadowverse: Evolve",
+"sets": 51,
+"cards": 7412,
+"packs": true
+},
+{
+"name": "One Piece Card Game",
+"sets": 85,
+"cards": 7046,
+"packs": true
+},
+{
+"name": "Union Arena",
+"sets": 78,
+"cards": 7018,
+"packs": true
+},
+{
+"name": "Final Fantasy TCG",
+"sets": 36,
+"cards": 5515,
+"packs": true
+},
+{
+"name": "Grand Archive TCG",
+"sets": 51,
+"cards": 5273,
+"packs": true
+},
+{
+"name": "WIXOSS",
+"sets": 30,
+"cards": 4588,
+"packs": true
+},
+{
+"name": "Dragon Ball Super: Fusion World",
+"sets": 50,
+"cards": 4280,
+"packs": true
+},
+{
+"name": "Disney Lorcana",
+"sets": 20,
+"cards": 3593,
+"packs": true
+},
+{
+"name": "Kryptik TCG",
+"sets": 5,
+"cards": 3191,
+"packs": true
+},
+{
+"name": "Elestrals",
+"sets": 58,
+"cards": 3131,
+"packs": true
+},
+{
+"name": "MetaZoo",
+"sets": 39,
+"cards": 3026,
+"packs": true
+},
+{
+"name": "Dice Masters",
+"sets": 27,
+"cards": 2634,
+"packs": true
+},
+{
+"name": "Alpha Clash",
+"sets": 18,
+"cards": 2292,
+"packs": true
+},
+{
+"name": "CookieRun: Braverse TCG",
+"sets": 10,
+"cards": 2259,
+"packs": true
+},
+{
+"name": "Star Wars: Destiny",
+"sets": 13,
+"cards": 2238,
+"packs": true
+},
+{
+"name": "Akora TCG",
+"sets": 8,
+"cards": 2218,
+"packs": true
+},
+{
+"name": "Gundam Card Game",
+"sets": 26,
+"cards": 2006,
+"packs": true
+},
+{
+"name": "hololive OFFICIAL CARD GAME",
+"sets": 18,
+"cards": 1968,
+"packs": true
+},
+{
+"name": "Battle Spirits Saga",
+"sets": 20,
+"cards": 1841,
+"packs": true
+},
+{
+"name": "Dragon Ball Z TCG",
+"sets": 9,
+"cards": 1800,
+"packs": true
+},
+{
+"name": "Riftbound: League of Legends Trading Card Game",
+"sets": 12,
+"cards": 1714,
+"packs": true
+},
+{
+"name": "Warhammer Age of Sigmar Champions TCG",
+"sets": 5,
+"cards": 1169,
+"packs": true
+},
+{
+"name": "Bakugan TCG",
+"sets": 4,
+"cards": 1166,
+"packs": true
+},
+{
+"name": "Gate Ruler",
+"sets": 11,
+"cards": 1138,
+"packs": true
+},
+{
+"name": "Argent Saga TCG",
+"sets": 10,
+"cards": 957,
+"packs": true
+},
+{
+"name": "Godzilla Card Game",
+"sets": 8,
+"cards": 936,
+"packs": true
+},
+{
+"name": "The Caster Chronicles",
+"sets": 12,
+"cards": 837,
+"packs": true
+},
+{
+"name": "Lightseekers TCG",
+"sets": 3,
+"cards": 762,
+"packs": true
+},
+{
+"name": "MetaX TCG",
+"sets": 5,
+"cards": 746,
+"packs": true
+},
+{
+"name": "Transformers TCG",
+"sets": 8,
+"cards": 716,
+"packs": true
+},
+{
+"name": "Dragoborne",
+"sets": 11,
+"cards": 671,
+"packs": true
+},
+{
+"name": "Munchkin CCG",
+"sets": 4,
+"cards": 590,
+"packs": true
+},
+{
+"name": "Cyberpunk TCG",
+"sets": 12,
+"cards": 459,
+"packs": true
+},
+{
+"name": "Exodus TCG",
+"sets": 8,
+"cards": 426,
+"packs": true
+},
+{
+"name": "Palworld OFFICIAL CARD GAME",
+"sets": 4,
+"cards": 264,
+"packs": true
+},
+{
+"name": "Chrono Clash System",
+"sets": 2,
+"cards": 97,
+"packs": true
+},
+{
+"name": "Zombie World Order TCG",
+"sets": 2,
+"cards": 69,
+"packs": true
+},
+{
+"name": "Naruto Card Game",
+"sets": 1,
+"cards": 2,
+"packs": false
+},
+{
+"name": "Sorcery: Contested Realm",
+"sets": 6,
+"cards": 0,
+"packs": true
+},
+{
+"name": "WoW",
+"sets": 34,
+"cards": 0,
+"packs": true
+}
+]

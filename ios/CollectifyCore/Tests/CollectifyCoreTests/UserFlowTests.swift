@@ -325,6 +325,30 @@ final class UserFlowTests: XCTestCase {
         XCTAssertEqual(arr(r).count, 14)
     }
 
+    func testUnnumberedCardSets() throws {
+        // Some games (Sorcery ...) list their cards without a collector number, only a rarity. A set with too few
+        // numbered cards counts those, unless the name looks like sealed product; tiny sets and sealed items never do.
+        try db.exec("INSERT INTO categories(category_id, name, display_name, popularity) VALUES(77,'Sorcery','Sorcery: Contested Realm',50)")
+        try db.exec("INSERT INTO groups(group_id, category_id, name, published_on) VALUES(300,77,'Gothic','2025-01-01'),(301,77,'Tiny','2025-02-01')")
+        let ins = "INSERT INTO products(product_id, group_id, category_id, name, clean_name, image_url, number, rarity) VALUES(?,?,?,?,?,?,?,?)"
+        for n in 0..<10 { try db.exec(ins, [3000 + n, 300, 77, "Gothic Card \(n)", "Gothic Card \(n)", "https://img/g\(n).jpg", nil, n % 2 == 0 ? "Ordinary" : "Elite"]) }
+        try db.exec(ins, [3100, 300, 77, "Gothic Archon Deck", "Gothic Archon Deck", "https://img/d.jpg", nil, "Elite"])
+        try db.exec(ins, [3101, 300, 77, "Gothic Booster Box", "Gothic Booster Box", "https://img/b.jpg", nil, "Elite"])
+        try db.exec(ins, [3102, 300, 77, "Gothic Welcome Kit", "Gothic Welcome Kit", "https://img/k.jpg", nil, nil])
+        for n in 0..<3 { try db.exec(ins, [3200 + n, 301, 77, "Tiny Card \(n)", "Tiny Card \(n)", "https://img/t\(n).jpg", nil, "Ordinary"]) }
+        var (c, r) = call("GET", "/api/game/pool?group_id=300")
+        XCTAssertEqual(c, 200)
+        XCTAssertEqual(arr(r).count, 10)
+        (c, r) = call("GET", "/api/game/pool?group_id=301")
+        XCTAssertEqual(arr(r).count, 3)
+        (c, r) = call("GET", "/api/game/vsealed?category_id=77")
+        XCTAssertEqual(arr(r).map { $0["group_id"] as? Int }, [300])
+        XCTAssertEqual(arr(r)[0]["card_count"] as? Int, 10)
+        // a set with eight or more numbered cards keeps using only those
+        (c, r) = call("GET", "/api/game/pool?group_id=101")
+        XCTAssertEqual(arr(r).count, 14)
+    }
+
     func testStaticAssets() throws {
         let www = dir.appendingPathComponent("www")
         try FileManager.default.createDirectory(at: www.appendingPathComponent("vendor"), withIntermediateDirectories: true)

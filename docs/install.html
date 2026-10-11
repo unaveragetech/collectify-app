@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install Collectify on Android and iPhone</title>
+<meta name="description" content="Step-by-step instructions for installing Collectify on Android (APK) and iPhone or iPad (IPA with AltStore, Sideloadly or TrollStore), plus updating, refreshing and troubleshooting.">
+<meta name="theme-color" content="#070a12">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+<div class="wrap">
+  <div class="pagehead" id="download">
+    <span class="kicker">Install</span>
+    <h1>Install Collectify</h1>
+    <p class="lead">Collectify isn't in the Play Store or App Store, so you install the file directly. That's normal for hobby apps, it's reversible, and it takes about two minutes on Android and ten the first time on iPhone.</p>
+    <div class="btns" id="dl-btns"></div>
+    <small style="display:block;margin-top:10px;color:var(--muted)" id="dl-note"></small>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button id="tab-android" class="on" role="tab">🤖 Android</button>
+    <button id="tab-iphone" role="tab">📱 iPhone / iPad</button>
+  </div>
+
+  <!-- ===================== ANDROID ===================== -->
+  <div class="panel on" id="panel-android">
+    <div class="callout blue"><h3>You need</h3><p>Android 8.0 or newer, about <b>450 MB</b> of free space (the app is ~90 MB; on first launch it unpacks the card catalog), and a way to open files from your browser's downloads.</p></div>
+
+    <div class="method">
+      <h3>Install the APK</h3>
+      <p class="sub">Works on every Android phone and tablet. No computer needed.</p>
+      <div class="step"><div class="n">1</div><div><h4>Download the file</h4><p>Tap <b>Download Android</b> above, or get <code>Collectify-vX.Y.Z.apk</code> from the <a href="changelog.html">changelog</a> or the GitHub releases page. Use your phone's browser. If it warns "this type of file can harm your device", tap <b>Download anyway</b>: that message appears for every APK from outside the Play Store.</p></div></div>
+      <div class="step"><div class="n">2</div><div><h4>Open it</h4><p>When the download finishes, tap <b>Open</b> in the browser's download bar, or open the <b>Downloads</b> app (Files → Downloads) and tap the APK.</p></div></div>
+      <div class="step"><div class="n">3</div><div><h4>Allow installs from this source (first time only)</h4><p>Android will say <i>"For your security, your phone isn't allowed to install unknown apps from this source."</i> Tap <b>Settings</b>, switch on <b>Allow from this source</b> for the browser or file manager you used, then press back.</p><ul><li>Samsung and some others: Settings → Apps → <i>your browser</i> → Install unknown apps.</li><li>You can switch the permission off again afterwards.</li></ul></div></div>
+      <div class="step"><div class="n">4</div><div><h4>Tap Install</h4><p>If Google Play Protect says <i>"App blocked to protect your device"</i> or <i>"Unknown developer"</i>, tap <b>More details → Install anyway</b>. It shows this for any app that isn't from the Play Store.</p></div></div>
+      <div class="step"><div class="n">5</div><div><h4>Open Collectify</h4><p>The first launch takes a few seconds while it unpacks the card catalog. Camera permission is asked the first time you scan a card, and notification permission only if you turn on reminders.</p></div></div>
+    </div>
+
+    <div class="method">
+      <h3>Updating</h3>
+      <p class="sub">Updates install over the top and keep everything: binders, wishlist, grades, trades and game progress.</p>
+      <div class="step"><div class="n">1</div><div><h4>Check for a new version</h4><p>In the app tap the <b>ℹ️</b> button, then <b>Check for updates</b>. It tells you if there is a newer version and checks that your installed copy matches the published checksum.</p></div></div>
+      <div class="step"><div class="n">2</div><div><h4>Download and open the new APK</h4><p>Follow steps 1, 2 and 4 above. It says <b>Update</b> instead of Install. Never uninstall first: that deletes your collection.</p></div></div>
+    </div>
+
+    <div class="method">
+      <h3>If something goes wrong (Android)</h3>
+      <details><summary>"App not installed" or "There was a problem parsing the package"</summary><p>The download is usually incomplete. Delete it and download again over a stable connection, then compare the SHA-256 (see below). Make sure there's room: the install needs a few hundred MB free.</p></details>
+      <details><summary>"App not installed as package conflicts with an existing package"</summary><p>You have a copy of Collectify signed with a different key (a debug or test build). Back up anything you need, uninstall that copy, then install this one. Every official release from 0.11.1 on uses the same key, so normal updates never hit this.</p></details>
+      <details><summary>I can't find "Install unknown apps"</summary><p>Search for <i>unknown apps</i> in Settings. On Android 8+ the permission is per app (your browser or file manager), not global.</p></details>
+      <details><summary>The first launch is stuck on the logo</summary><p>Give it up to a minute on older phones; it's copying the catalog. If it doesn't move, close the app from recents and open it again. Still stuck? Check you have a few hundred MB free.</p></details>
+      <details><summary>The camera doesn't work</summary><p>Settings → Apps → Collectify → Permissions → Camera → Allow. Cards scan best in even light with the card filling most of the frame.</p></details>
+    </div>
+  </div>
+
+  <!-- ===================== IPHONE ===================== -->
+  <div class="panel" id="panel-iphone">
+    <div class="callout warn"><h3>Read this first: how iPhone installs work</h3>
+      <p>Apple only lets apps from the App Store run, apart from ones <b>signed with your own Apple ID</b>. Collectify's <code>.ipa</code> is deliberately <b>unsigned</b>: a sideloading tool signs it for you, on your computer, with your Apple ID. Nothing is installed from us that you didn't sign yourself.</p>
+      <p><b>With a free Apple ID the signature lasts 7 days.</b> After that the app stops opening until you "refresh" it (reinstall over the top with the same tool; your data is kept). AltStore can do the refresh automatically in the background when your phone and computer are on the same Wi-Fi. A paid developer account ($99/yr) gives one year. TrollStore installs don't expire at all but only work on certain iOS versions.</p>
+    </div>
+
+    <div class="callout" style="margin-top:14px"><h3>Which method should I pick?</h3>
+      <div class="tablewrap" style="margin-top:10px;background:transparent;border:0"><table>
+        <thead><tr><th></th><th>AltStore</th><th>Sideloadly</th><th>TrollStore</th></tr></thead>
+        <tbody>
+          <tr><td><b>Computer needed</b></td><td>Windows or Mac (AltServer)</td><td>Windows or Mac</td><td>No (once installed)</td></tr>
+          <tr><td><b>Auto-refresh every week</b></td><td>Yes, over Wi-Fi</td><td>Manual (plug in and press Start)</td><td>Not needed</td></tr>
+          <tr><td><b>Difficulty</b></td><td>Medium (one-time setup)</td><td>Easiest</td><td>Hardest; only some iOS versions</td></tr>
+          <tr><td><b>Best for</b></td><td>Long-term use</td><td>Trying it quickly</td><td>People who already have it</td></tr>
+        </tbody></table></div>
+      <p style="margin-top:8px">If you're not sure, use <b>Sideloadly</b> to try the app, and move to <b>AltStore</b> if you keep it.</p>
+    </div>
+
+    <div class="method">
+      <h3>Method 1: Sideloadly (easiest)</h3>
+      <p class="sub">A Windows or Mac app that signs and installs the IPA over a USB cable.</p>
+      <div class="step"><div class="n">1</div><div><h4>Get the pieces</h4><ul><li>Download Collectify's <code>.ipa</code> to your <b>computer</b> (button above).</li><li>Install <a href="https://sideloadly.io" rel="noopener">Sideloadly</a> from sideloadly.io.</li><li>On Windows, install <b>iTunes</b> and <b>iCloud</b> from Apple's own website (not the Microsoft Store versions), because Sideloadly needs their USB drivers.</li></ul></div></div>
+      <div class="step"><div class="n">2</div><div><h4>Connect your iPhone</h4><p>Plug it in with a cable, unlock it and tap <b>Trust This Computer</b> if asked.</p></div></div>
+      <div class="step"><div class="n">3</div><div><h4>Load the IPA</h4><p>Drag <code>Collectify-vX.Y.Z.ipa</code> onto the Sideloadly window. Type your <b>Apple ID</b> email. (Using a spare Apple ID just for sideloading is a good habit.)</p></div></div>
+      <div class="step"><div class="n">4</div><div><h4>Press Start</h4><p>Enter your Apple ID password when asked. Sideloadly sends it to Apple only, to get a signing certificate. If your account uses two-factor, type the code Apple sends.</p></div></div>
+      <div class="step"><div class="n">5</div><div><h4>Trust the app on the iPhone</h4><p>Open <b>Settings → General → VPN &amp; Device Management</b> (on older iOS: <i>Profiles &amp; Device Management</i>), tap your Apple ID under <i>Developer App</i>, then <b>Trust</b>.</p></div></div>
+      <div class="step"><div class="n">6</div><div><h4>Turn on Developer Mode (iOS 16 and newer)</h4><p>If Collectify says <i>"Developer Mode required"</i> when you open it: Settings → Privacy &amp; Security → scroll to <b>Developer Mode</b> → On. The phone restarts and asks you to confirm.</p></div></div>
+      <div class="step"><div class="n">7</div><div><h4>Open Collectify</h4><p>Allow <b>Camera</b> (scanner and trade QR) and, for in-person trades, <b>Local Network</b>. The first launch unpacks the catalog.</p></div></div>
+      <p style="color:var(--muted);font-size:14px"><b>Every 7 days:</b> repeat steps 2 to 4 with the same Apple ID. Because it's the same app and the same ID, it installs over the old copy and keeps your data.</p>
+    </div>
+
+    <div class="method">
+      <h3>Method 2: AltStore (refreshes itself)</h3>
+      <p class="sub">Install AltServer on your computer once; it keeps the app signed in the background.</p>
+      <div class="step"><div class="n">1</div><div><h4>Install AltServer and AltStore</h4><p>Follow the official guide at <a href="https://altstore.io" rel="noopener">altstore.io</a> (Windows needs iTunes and iCloud from Apple's website, as above). In short: run AltServer, choose <b>Install AltStore</b> → your iPhone, sign in with your Apple ID.</p></div></div>
+      <div class="step"><div class="n">2</div><div><h4>Trust AltStore</h4><p>Settings → General → VPN &amp; Device Management → your Apple ID → <b>Trust</b>. Turn on Developer Mode if asked.</p></div></div>
+      <div class="step"><div class="n">3</div><div><h4>Get the IPA onto the iPhone</h4><p>On the iPhone, open this page in Safari and download <code>Collectify-vX.Y.Z.ipa</code>. Then tap <b>Share</b> (or open it from <i>Files → Downloads</i>) and choose <b>Open in AltStore</b>, or open AltStore → <b>My Apps</b> → <b>+</b> and pick the file.</p></div></div>
+      <div class="step"><div class="n">4</div><div><h4>Wait for it to finish</h4><p>AltStore signs and installs it. Then open Collectify from the home screen.</p></div></div>
+      <div class="step"><div class="n">5</div><div><h4>Keep it refreshed</h4><ul><li>Leave AltServer running on your computer, on the same Wi-Fi as your phone.</li><li>AltStore refreshes apps automatically a day or so before they expire. You can also open AltStore → My Apps → <b>Refresh All</b>.</li><li>A free Apple ID can have <b>3 sideloaded apps</b> at once, and AltStore counts itself.</li></ul></div></div>
+    </div>
+
+    <div class="method">
+      <h3>Method 3: TrollStore (no expiry)</h3>
+      <p class="sub">Only works on specific iOS versions (roughly iOS 14.0 to 16.6.1 and 17.0). Check the TrollStore project to see whether yours is supported before trying.</p>
+      <div class="step"><div class="n">1</div><div><h4>Install TrollStore for your iOS version</h4><p>Follow the instructions on the TrollStore project's own page. If your version isn't supported, use Method 1 or 2.</p></div></div>
+      <div class="step"><div class="n">2</div><div><h4>Download the IPA in Safari and share it to TrollStore</h4><p>Tap the downloaded file → Share → <b>TrollStore</b> → Install. The signature doesn't expire, so there's nothing to refresh.</p></div></div>
+    </div>
+
+    <div class="method">
+      <h3>Updating on iPhone</h3>
+      <p class="sub">Your data is kept as long as you install the new IPA over the old app with the same Apple ID.</p>
+      <div class="step"><div class="n">1</div><div><h4>See if there's something newer</h4><p>In the app tap <b>ℹ️ → Check for updates</b>. On iPhone the About panel also shows how long this install's signature has left (when installed with Sideloadly or AltStore).</p></div></div>
+      <div class="step"><div class="n">2</div><div><h4>Download the new IPA and sideload it again</h4><p>Use the same method and the <b>same Apple ID</b> you used the first time. <b>Don't delete the app first</b>: deleting an app on iOS removes its data.</p></div></div>
+    </div>
+
+    <div class="method">
+      <h3>If something goes wrong (iPhone)</h3>
+      <details><summary>"Untrusted Developer" when I open the app</summary><p>Settings → General → VPN &amp; Device Management → tap your Apple ID → <b>Trust</b>.</p></details>
+      <details><summary>The app opens and immediately closes, or says it can't be opened</summary><p>Usually the 7-day signature ran out. Sideload it again (Method 1 or 2) with the same Apple ID. Also check Developer Mode is on (iOS 16+).</p></details>
+      <details><summary>"Developer Mode" doesn't appear in Settings</summary><p>It only shows up after you've sideloaded an app. Install Collectify, then look in Settings → Privacy &amp; Security again.</p></details>
+      <details><summary>Sideloadly says my Apple ID has too many certificates / the app limit was reached</summary><p>Free Apple IDs can have 3 active sideloaded apps and a limited number of certificates per week. Remove an old sideloaded app, or wait a few days, or use a different Apple ID.</p></details>
+      <details><summary>Sideloadly or AltServer can't see my iPhone (Windows)</summary><p>Install iTunes and iCloud from Apple's website (not the Microsoft Store), reconnect the cable, and tap Trust on the phone.</p></details>
+      <details><summary>Trades don't work / "Local Network" is blocked</summary><p>iPhone asks permission once. Settings → Collectify → <b>Local Network</b> → On. Both phones must be on the same Wi-Fi.</p></details>
+      <details><summary>Notifications for reminders don't show</summary><p>Settings → Notifications → Collectify → Allow. The app asks the first time you turn a reminder on.</p></details>
+      <details><summary>Is it safe to give my Apple ID to Sideloadly or AltStore?</summary><p>Both talk to Apple's own servers to get a free developer certificate; that's how Apple's developer program works. Many people use a separate Apple ID just for this. We never see your Apple ID or password: the IPA is the same unsigned file for everyone.</p></details>
+    </div>
+  </div>
+
+  <!-- ===================== VERIFY / ALL VERSIONS ===================== -->
+  <section id="verify">
+    <h2>Check your file is genuine</h2>
+    <p class="lead">Every release publishes a SHA-256 checksum for each file. If yours doesn't match, delete it and download again from this site or the GitHub releases page.</p>
+    <div class="grid two">
+      <div class="card"><h3>On Windows</h3><pre>Get-FileHash .\Collectify-vX.Y.Z.apk -Algorithm SHA256</pre></div>
+      <div class="card"><h3>On Mac or Linux</h3><pre>shasum -a 256 Collectify-vX.Y.Z.ipa   # or sha256sum</pre></div>
+    </div>
+    <p class="lead" style="margin-top:12px">A checksum only proves the file matches what we published. It can't tell you anything about a copy from somewhere else.</p>
+  </section>
+
+  <section id="versions">
+    <h2>All versions</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Version</th><th>Released</th><th>Size</th><th>SHA-256</th><th>Get it</th></tr></thead>
+      <tbody id="rel-rows"><tr><td colspan="5" style="color:var(--muted)">Loading releases…</td></tr></tbody>
+    </table></div>
+    <p class="lead" style="margin-top:12px">Data for this table is public JSON: <a href="releases.json">releases.json</a> (all releases) and <a href="latest.json">latest.json</a> (the newest).</p>
+  </section>
+</div>
+</main>
+<div id="site-footer"></div>
+<script src="site.js"></script>
+<script>
+(function () {
+  var S = window.Site;
+  function show(which) {
+    ["android", "iphone"].forEach(function (k) {
+      document.getElementById("panel-" + k).classList.toggle("on", k === which);
+      document.getElementById("tab-" + k).classList.toggle("on", k === which);
+    });
+    try { history.replaceState(null, "", "#" + which); } catch (e) {}
+  }
+  document.getElementById("tab-android").onclick = function () { show("android"); };
+  document.getElementById("tab-iphone").onclick = function () { show("iphone"); };
+  var h = (location.hash || "").replace("#", "");
+  var ua = navigator.userAgent || "";
+  if (h === "iphone" || h === "ios") show("iphone");
+  else if (h === "android") show("android");
+  else if (/iPhone|iPad|iPod/.test(ua)) show("iphone");
+
+  S.releases().then(function (list) {
+    var r = list[0]; if (!r) return;
+    var box = document.getElementById("dl-btns");
+    box.innerHTML = '<a class="btn primary" href="' + r.download + '">⬇ Android v' + r.version + ' (' + S.fmtSize(r.size) + ')</a>' + (r.ipa ? '<a class="btn" href="' + r.ipaDownload + '">⬇ iPhone v' + r.version + ' (' + S.fmtSize(r.ipaSize) + ')</a>' : "");
+    document.getElementById("dl-note").textContent = "Latest: v" + r.version + (r.date ? " · " + S.fmtDate(r.date) : "") + ". Older versions are listed at the bottom of this page.";
+    document.getElementById("rel-rows").innerHTML = list.map(function (x, i) {
+      return '<tr><td><b>v' + x.version + '</b>' + (i === 0 ? '<span class="tag">latest</span>' : "") + '<br><small style="color:var(--muted)">build ' + (x.versionCode || "?") + '</small></td>' +
+        '<td>' + (x.date ? S.fmtDate(x.date) : "") + '</td>' +
+        '<td>' + S.fmtSize(x.size) + (x.ipa ? '<br><small style="color:var(--muted)">iOS ' + S.fmtSize(x.ipaSize) + '</small>' : "") + '</td>' +
+        '<td class="hash"><small style="color:var(--muted)">APK</small> ' + x.sha256 + '<button class="copy" data-h="' + x.sha256 + '">copy</button>' + (x.ipa && x.ipaSha256 ? '<br><small style="color:var(--muted)">IPA</small> ' + x.ipaSha256 + '<button class="copy" data-h="' + x.ipaSha256 + '">copy</button>' : "") + '</td>' +
+        '<td><a href="' + x.download + '">APK</a>' + (x.ipa ? ' · <a href="' + x.ipaDownload + '">IPA</a>' : "") + ' · <a href="' + x.url + '">notes</a></td></tr>';
+    }).join("");
+    S.copyButtons();
+  }).catch(function () { document.getElementById("rel-rows").innerHTML = '<tr><td colspan="5">Couldn\'t load the list. See the <a href="' + S.REPO + '/releases">releases page</a>.</td></tr>'; });
+})();
+</script>
+</body>
+</html>

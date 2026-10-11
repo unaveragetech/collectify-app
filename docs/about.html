@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About Collectify - goals, how it's built, privacy and FAQ</title>
+<meta name="description" content="What Collectify is for, how it's built (Kotlin and Swift servers, one web interface), what data it uses, privacy details and frequently asked questions.">
+<meta name="theme-color" content="#070a12">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+<div class="wrap">
+  <div class="pagehead">
+    <span class="kicker">About</span>
+    <h1>About Collectify</h1>
+    <p class="lead">Collectify is a free, independent app for people who collect trading cards. It started as a way to keep a binder in your pocket and grew into a scanner, a price guide, an in-person trading tool and a game.</p>
+    <div class="toc"><a href="#goals">Goals</a><a href="#built">How it's built</a><a href="#data">Data sources</a><a href="#privacy">Privacy</a><a href="#faq">FAQ</a><a href="#limits">Limits</a></div>
+  </div>
+
+  <section id="goals">
+    <h2>Goals</h2>
+    <p class="lead">What we're building toward, and what we won't compromise on.</p>
+    <div class="grid">
+      <div class="card"><h3>Your collection stays yours</h3><p>No accounts and no ads. Binders, wishlist, grades and trades live on your device and survive updates.</p></div>
+      <div class="card"><h3>Works anywhere</h3><p>At a card show with no signal, the full catalog, scanner and binders still work. Everything needed is inside the app.</p></div>
+      <div class="card"><h3>Honest numbers</h3><p>Prices are labelled estimates. A grade you set yourself is a "pseudo-grade". The scanner shows its confidence and says "couldn't read it" when that's the truth.</p></div>
+      <div class="card"><h3>Fun that stays in its lane</h3><p>The Treasure Box is there for engagement, but it's kept visibly separate from your real collection so it never inflates your numbers.</p></div>
+    </div>
+    <div class="callout" style="margin-top:16px"><h3>Looking ahead: Collective</h3><p><span class="pill">Planned</span> A grading service with market data built in: graded cards would be public records, sealed with a tamper-evident seal, with faster turnaround and lower fees than the established graders. Collective is not live: there is no launch date or pricing yet, and until it exists the in-app grades are pseudo-grades only.</p></div>
+  </section>
+
+  <section id="built">
+    <h2>How it's built</h2>
+    <p class="lead">A few deliberate choices that shape how the app behaves.</p>
+    <div class="grid">
+      <div class="card"><h3>Catalog inside the app</h3><p>A snapshot of the tcgcsv catalog ships as a SQLite database, so there's nothing to download on first run. Updating the app brings a newer catalog without touching your own data.</p></div>
+      <div class="card"><h3>Local server + web view</h3><p>The app embeds a tiny HTTP server on 127.0.0.1 and shows a web interface, the same one as the desktop version. One UI for desktop, Android and iPhone; the on-device server is written natively for each (Kotlin and Swift) and tested against each other. Camera access works because localhost is a secure context.</p></div>
+      <div class="card"><h3>Scanner = evidence, not a guess</h3><p>Several OCR passes, fuzzy matching against real card names, where on the card the words were found, collector numbers and an artwork comparison are combined into one confidence. It declines rather than inventing a name.</p></div>
+      <div class="card"><h3>Trades you can trust at a glance</h3><p>Trades happen in a shared room on the host's phone over your local network, never a server of ours. A verification code appears on both phones and nothing moves until both confirm.</p></div>
+      <div class="card"><h3>Same release, both phones</h3><p>Every version ships as an Android APK (signed with one key, so updates install over the old one) and an iPhone IPA from the same interface. We publish the SHA-256 of each file.</p></div>
+      <div class="card"><h3>Golden tests</h3><p>The Swift server is checked against answers recorded from the Kotlin one, including search ranking, pricing and generated pack art, so the two phones behave the same.</p></div>
+    </div>
+  </section>
+
+  <section id="data">
+    <h2>Data sources</h2>
+    <p class="lead"><b>Card catalog and prices:</b> <a href="https://tcgcsv.com" rel="noopener">tcgcsv.com</a>, which republishes TCGplayer's product catalog and market prices. <b>Card pictures:</b> loaded on demand from TCGplayer's image servers. Each release ships a fresh catalog snapshot; <i>Sync prices</i> in the app fetches newer numbers.</p>
+    <p class="lead">Generated booster packs (for sets that don't have a real sealed pack in the catalog) are built on the phone from the catalog's own cards for that set. They're a game feature; they're not a statement about what a real pack contains.</p>
+  </section>
+
+  <section id="privacy">
+    <h2>Privacy</h2>
+    <div class="grid two">
+      <div class="callout blue"><h3>What stays on your phone</h3><p>Your collection, binders, wishlist, grades, trades, game progress and settings. There is no account system and no analytics. Scanner photos are processed on the device and not uploaded.</p></div>
+      <div class="callout"><h3>When the app does go online</h3><ul class="plain"><li>tcgcsv.com when you sync prices.</li><li>TCGplayer's image servers to show card pictures.</li><li>This website (GitHub Pages) when you tap <i>Check for updates</i>.</li><li>A trade talks directly between the two phones on your local network.</li></ul></div>
+    </div>
+    <p class="lead" style="margin-top:12px">Permissions: <b>Camera</b> for the scanner and trade QR codes; <b>Notifications</b> only if you turn on reminders; on iPhone <b>Local Network</b> for in-person trading. Each is asked for when first needed.</p>
+  </section>
+
+  <section id="faq">
+    <h2>Questions</h2>
+    <details><summary>Will updating erase my binders?</summary><p>No. Updates install over the existing app and keep your data, as long as the file is one of ours (same signing key on Android, same Apple ID on iPhone). Don't uninstall or delete the app first: that does remove local data.</p></details>
+    <details><summary>Why isn't it on the Play Store or App Store?</summary><p>It's distributed as a direct download for now. That's why Android asks you to allow installing it and why the iPhone build is installed with a sideloading tool. See the <a href="install.html">install page</a>.</p></details>
+    <details><summary>Why does the iPhone version need refreshing every week?</summary><p>Apple signs sideloaded apps from a free Apple ID for 7 days. AltStore can refresh it for you automatically; Sideloadly needs a manual re-install; TrollStore doesn't expire. Your data is kept each time. The in-app About panel shows how long you have left.</p></details>
+    <details><summary>Is the iPhone app the same as the Android one?</summary><p>Same web interface, same on-device catalog, same features. The server underneath is a Swift port of the Android one, checked against it with tests. The iPhone build is newer and has had less real-device testing, so tell us if something misbehaves.</p></details>
+    <details><summary>Where do the prices come from, and how accurate are they?</summary><p>tcgcsv.com (TCGplayer data). Treat them as estimates; condition adjustments are approximate and thinly traded cards can swing a lot.</p></details>
+    <details><summary>Why is a card or set missing?</summary><p>The catalog follows tcgcsv. A brand-new set can take a while to appear, and each release ships a newer snapshot. If something looks wrong, <a href="https://github.com/unaveragetech/collectify-app/issues">open an issue</a>.</p></details>
+    <details><summary>Can game cards get into my real collection?</summary><p>No. Cards from the Treasure Box are badged, never count toward your collection's value, and trade only as <b>DIGITAL</b> cards.</p></details>
+    <details><summary>Is it free? Does it have ads?</summary><p>It is free, and today it has no ads. Coins in the game can't be bought. A later Android version may add small, non-intrusive ads from Google AdMob (one banner under the app, and an occasional ad when you open it) with a one-time purchase to remove them. If that ships, this page and the privacy section will say exactly what changes, and the app asks for your consent where the law requires it.</p></details>
+  </section>
+
+  <section id="limits">
+    <h2>Open about limits</h2>
+    <p class="lead">Collectify is young, independent software, so expect rough edges. It is not affiliated with, endorsed by or sponsored by TCGplayer, The Pokémon Company, Wizards of the Coast, Konami or any other publisher; all trademarks belong to their owners. Prices are estimates and not financial advice.</p>
+    <p class="lead">Bug or idea? <a href="https://github.com/unaveragetech/collectify-app/issues">Open an issue on GitHub</a>.</p>
+  </section>
+</div>
+</main>
+<div id="site-footer"></div>
+<script src="site.js"></script>
+</body>
+</html>

@@ -13,8 +13,22 @@ final class NativeBridge: NSObject, WKScriptMessageHandler {
         return host == "unaveragetech.github.io" || (host == "github.com" && url.path.hasPrefix("/unaveragetech/"))
     }
 
+    /// When the signature of a sideloaded install runs out (ms since 1970), read from the embedded provisioning
+    /// profile that AltStore / Sideloadly add. nil for unsigned or TrollStore installs.
+    static func signatureExpiry() -> Double? {
+        guard let path = Bundle.main.path(forResource: "embedded", ofType: "mobileprovision"),
+              let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
+              let start = data.range(of: Data("<?xml".utf8)),
+              let end = data.range(of: Data("</plist>".utf8)) else { return nil }
+        let plist = data[start.lowerBound..<end.upperBound]
+        guard let obj = try? PropertyListSerialization.propertyList(from: Data(plist), options: [], format: nil) as? [String: Any],
+              let date = obj["ExpirationDate"] as? Date else { return nil }
+        return date.timeIntervalSince1970 * 1000
+    }
+
     static func shimScript(versionName: String, build: Int, notifyGranted: Bool) -> String {
-        let info = "{\"versionName\":\"\(versionName)\",\"versionCode\":\(build),\"package\":\"com.collectify.app\",\"platform\":\"ios\"}"
+        let expires = signatureExpiry().map { ",\"expires\":\(Int64($0))" } ?? ""
+        let info = "{\"versionName\":\"\(versionName)\",\"versionCode\":\(build),\"package\":\"com.collectify.app\",\"platform\":\"ios\"\(expires)}"
         return """
         (function () {
           var post = function (o) { try { window.webkit.messageHandlers.\(messageName).postMessage(o); } catch (e) {} };

@@ -41,8 +41,7 @@ public enum VirtualPacks {
                           AND p.image_url IS NOT NULL AND \(Match.packClauseSQL)) AS has_real
             FROM groups g
             JOIN categories c ON c.category_id = g.category_id
-            JOIN (SELECT group_id, COUNT(*) AS cnt FROM products
-                  WHERE number IS NOT NULL AND image_url IS NOT NULL GROUP BY group_id HAVING COUNT(*) >= 12) n
+            JOIN (\(Match.groupCardCountSQL) GROUP BY p.group_id HAVING cnt >= \(Match.minSetCards)) n
               ON n.group_id = g.group_id
             WHERE g.category_id NOT IN (\(excluded.map(String.init).joined(separator: ",")))
             ORDER BY g.published_on DESC, g.group_id
@@ -61,7 +60,7 @@ public enum VirtualPacks {
         let r = try db.query("""
             SELECT AVG(m) AS a FROM (
               SELECT MAX(pr.market_price) AS m FROM products p JOIN prices pr ON pr.product_id = p.product_id
-              WHERE p.group_id = ? AND p.number IS NOT NULL AND pr.market_price IS NOT NULL
+              WHERE p.group_id = ? AND \(Match.poolCardSQL) AND pr.market_price IS NOT NULL
                 AND pr.price_date = (SELECT MAX(price_date) FROM prices WHERE product_id = pr.product_id AND sub_type_name = pr.sub_type_name)
               GROUP BY p.product_id)
             """, [groupId]).first

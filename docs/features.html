@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Collectify features - scanner, binders, prices, trading and games</title>
+<meta name="description" content="Everything Collectify does: card scanner, binders, price tracking, inspect and grade, in-person trading, the Treasure Box mining game with packs from every set, Island Care, and the full list of supported card games.">
+<meta name="theme-color" content="#070a12">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+<div class="wrap">
+  <div class="pagehead">
+    <span class="kicker">Features</span>
+    <h1>What Collectify does</h1>
+    <p class="lead">One app for the whole hobby loop: find the card, file it, value it, show it off, swap it. Everything below works on both Android and iPhone, and nearly all of it works offline.</p>
+    <div class="toc">
+      <a href="#scanner">Scanner</a><a href="#collection">Collection &amp; binders</a><a href="#prices">Prices</a><a href="#inspect">Inspect &amp; grade</a><a href="#trading">Trading</a><a href="#game">Treasure Box</a><a href="#island">Island Care</a><a href="#games">Supported games</a><a href="#more">And more</a>
+    </div>
+  </div>
+
+  <div class="feat" id="scanner">
+    <div>
+      <h2>📷 Card scanner</h2>
+      <p class="tagline">Point, tap, done. It tells you when it isn't sure.</p>
+      <p style="color:var(--muted)">The camera reads a card with on-device OCR, runs several passes, and matches the words against the real card names for that game. It combines the fuzzy name match, where on the card the words were found, collector numbers and an artwork comparison into one confidence score.</p>
+      <ul><li>Nothing is uploaded: photos never leave your phone.</li><li>On our own 54-card test of simulated phone photos it named the right card about 65% of the time (the earlier approach managed about 24%). Real results depend on light and focus.</li><li>If it can't read the card it says so, rather than inventing a name.</li></ul>
+    </div>
+    <div class="shot"><img src="shots/scanner.jpg" alt="The scanner" onerror="this.parentNode.classList.add('empty');this.closest('.feat').classList.add('noshot')"></div>
+  </div>
+
+  <div class="feat" id="collection">
+    <div>
+      <h2>📔 Collection and binders</h2>
+      <p class="tagline">Everything you own, with what it's worth.</p>
+      <ul><li>Add cards by search or scan, with quantity, condition and printing (normal, foil and so on).</li><li>Page-by-page <b>binders</b> with a total value, search, sleeves, and covers you design from your own cards and stickers.</li><li>A <b>wishlist</b> for what you're hunting, with the current price next to each card.</li><li>Collection value, by game and by set, so you can see where the money is.</li><li>No account. It's all in a database on your phone and survives app updates.</li></ul>
+    </div>
+    <div class="shot"><img src="shots/collection.jpg" alt="A binder" onerror="this.parentNode.classList.add('empty');this.closest('.feat').classList.add('noshot')"></div>
+  </div>
+
+  <div class="feat" id="prices">
+    <div>
+      <h2>💲 Prices</h2>
+      <p class="tagline">Around half a million cards and products, offline.</p>
+      <ul><li>Market prices from tcgcsv.com, which republishes TCGplayer's catalog. They're <b>estimates</b>, never offers to buy or sell.</li><li>Condition adjustments (near mint to damaged) and separate prices for foil and normal where they exist.</li><li>The whole catalog is inside the app. Nothing to download on first run, and no signal needed at a card show.</li><li>Press <b>Sync prices</b> when you want fresher numbers. Each release also ships a newer catalog, which merges in without touching your own data.</li></ul>
+    </div>
+    <div class="shot"><img src="shots/prices.jpg" alt="Card prices" onerror="this.parentNode.classList.add('empty');this.closest('.feat').classList.add('noshot')"></div>
+  </div>
+
+  <div class="feat" id="inspect">
+    <div>
+      <h2>🔎 Inspect and grade</h2>
+      <p class="tagline">Your own estimate, labelled as such.</p>
+      <ul><li>Zoom into corners, edges and surface, measure centering, and record a <b>pseudo-grade</b>.</li><li>It's clearly marked as your estimate: it isn't from a grading company.</li><li>Attach the notes to the card so you remember why you scored it that way.</li></ul>
+    </div>
+    <div class="shot"><img src="shots/inspect.jpg" alt="Inspect a card" onerror="this.parentNode.classList.add('empty');this.closest('.feat').classList.add('noshot')"></div>
+  </div>
+
+  <div class="feat" id="trading">
+    <div>
+      <h2>🤝 In-person trading</h2>
+      <p class="tagline">Two phones, one live trade, no server of ours.</p>
+      <ul><li>One person makes a <b>trade room</b> and shows a QR code. The other scans it on the same Wi-Fi.</li><li>Both phones see the same offer live. Either side can agree or leave, and any change resets both agreements.</li><li>A verification code on both screens confirms you're in the same room.</li><li>Cards are marked <b>physical</b> or <b>digital</b>, and values for both sides are shown side by side.</li><li>You swap the real cards; the app moves the records.</li></ul>
+    </div>
+    <div class="shot"><img src="shots/trade.jpg" alt="A trade room" onerror="this.parentNode.classList.add('empty');this.closest('.feat').classList.add('noshot')"></div>
+  </div>
+
+  <div class="feat" id="game">
+    <div>
+      <h2>⛏️ Treasure Box</h2>
+      <p class="tagline">A mining game that can open a booster pack from any set.</p>
+      <ul><li>Start with a free, auto-equipped Wooden Pickaxe and enough coins to get going. Mine rock to earn coins and booster packs.</li><li><b>Packs from every game.</b> Where a real sealed booster pack exists in the catalog you get that. For every other set, Collectify generates a pack from the cards we have, with its own foil wrapper, a price based on the set's cards and difficulty to match.</li><li>Slice the foil, pull the cards, tuck them into binders. Rarer cards flash. Pulls come from the real card list of that set.</li><li>Keep unopened packs in your inventory, trade them, stack them, queue several.</li><li>A free <b>daily pack</b> from any game, <b>Mystery Blocks</b>, a forge, prestige for badges and new features, and pickaxe upgrades.</li><li>Game cards are clearly badged, never count toward your collection's value, and trade only as marked <b>DIGITAL</b> cards.</li></ul>
+    </div>
+    <div class="shot"><img src="shots/game.jpg" alt="The Treasure Box game" onerror="this.parentNode.classList.add('empty');this.closest('.feat').classList.add('noshot')"></div>
+  </div>
+
+  <div class="feat" id="island">
+    <div>
+      <h2>🏝️ Island Care</h2>
+      <p class="tagline">A two-minute check-in that isn't homework.</p>
+      <ul><li>A small 3D island to look after: grow berries, craft food and toys, and keep your Pokémon fed, watered and happy.</li><li>Scanning cards feeds the island, but you can play without scanning.</li><li><b>No pet ever dies.</b> If you're away, they just wait.</li><li>Your coins are shared with the Treasure Box.</li><li>Optional reminders if you'd like a nudge.</li></ul>
+    </div>
+    <div class="shot"><img src="shots/island.jpg" alt="Island Care" onerror="this.parentNode.classList.add('empty');this.closest('.feat').classList.add('noshot')"></div>
+  </div>
+
+  <section id="games">
+    <span class="kicker">Catalog</span>
+    <h2>Supported card games</h2>
+    <p class="lead" id="games-lead">Every game in the tcgcsv catalog is searchable, priced and can be added to your collection. Games with enough cards in a set also get booster packs in the Treasure Box.</p>
+    <div class="filter"><input class="search" id="gsearch" placeholder="Search games…" type="search"><span class="pill green" id="gcount"></span><span class="pill" style="margin-left:4px">★ has packs to open</span></div>
+    <div class="toc" id="gchips"><span style="color:var(--muted)">Loading…</span></div>
+  </section>
+
+  <section id="more">
+    <h2>And more</h2>
+    <div class="grid">
+      <div class="card"><h3>🔒 Private</h3><p>No account, no ads, no tracking. Network use is limited to prices, card pictures and the update check. <a href="about.html#privacy">Details</a></p></div>
+      <div class="card"><h3>📴 Works offline</h3><p>The catalog, scanner (OCR runs on the phone), binders and games all work with no signal.</p></div>
+      <div class="card"><h3>🔔 Reminders</h3><p>Optional local notifications for Island Care and daily packs. They're scheduled on the phone, with no server involved.</p></div>
+      <div class="card"><h3>🔄 Update check</h3><p>In the app, ℹ️ → Check for updates compares your version and, on Android, your installed APK's checksum with the published one.</p></div>
+      <div class="card"><h3>🖥️ Desktop twin</h3><p>The same interface also runs on a desktop browser (a small Python server), which is how the mobile apps are tested against a full catalog.</p></div>
+      <div class="card"><h3>🧪 Tested against each other</h3><p>The iPhone server is a Swift port of the Android one, checked against answers recorded from it: search, prices, pack generation, even the generated wrapper art.</p></div>
+    </div>
+    <p class="lead" style="margin-top:20px">Ready? <a href="install.html">Install it in two minutes →</a></p>
+  </section>
+</div>
+</main>
+<div id="site-footer"></div>
+<script src="site.js"></script>
+<script>
+(function () {
+  var S = window.Site, games = [];
+  function paint() {
+    var q = document.getElementById("gsearch").value.trim().toLowerCase();
+    var list = games.filter(function (g) { return !q || g.name.toLowerCase().indexOf(q) >= 0; });
+    document.getElementById("gcount").textContent = list.length + " of " + games.length + " games";
+    document.getElementById("gchips").innerHTML = list.length ? list.map(function (g) { return '<a style="cursor:default" title="' + S.esc(g.sets + " sets, " + g.cards.toLocaleString() + " cards") + '">' + (g.packs ? "★ " : "") + S.esc(g.name) + "</a>"; }).join("") : '<span style="color:var(--muted)">No game matches that.</span>';
+  }
+  fetch("games.json").then(function (r) { return r.json(); }).then(function (d) { games = d; paint(); document.getElementById("gsearch").addEventListener("input", paint); })
+    .catch(function () { document.getElementById("gchips").innerHTML = '<span style="color:var(--muted)">The game list couldn\'t be loaded.</span>'; });
+})();
+</script>
+</body>
+</html>

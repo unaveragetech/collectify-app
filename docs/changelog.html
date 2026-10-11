@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Collectify changelog - every release and what changed</title>
+<meta name="description" content="The full Collectify changelog: every release for Android and iPhone with notes, sizes, checksums and download links.">
+<meta name="theme-color" content="#070a12">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+<div class="wrap">
+  <div class="pagehead">
+    <span class="kicker">Changelog</span>
+    <h1>What changed, release by release</h1>
+    <p class="lead">Newest first. Every release ships an Android <code>.apk</code> and (from 0.21.0) an iPhone <code>.ipa</code>, with the checksum of each. Updates install over the old version and keep your data.</p>
+    <div class="filter"><input class="search" id="q" type="search" placeholder="Search the changelog (e.g. packs, scanner, trade)…"><span class="pill green" id="count"></span></div>
+  </div>
+  <div id="list"><div class="rel"><div class="md"><p>Loading…</p></div></div></div>
+</div>
+</main>
+<div id="site-footer"></div>
+<script src="site.js"></script>
+<script>
+(function () {
+  var S = window.Site, all = [];
+  function title(r) {
+    var l = (r.notes || "").split(/\r?\n/).filter(function (x) { return /^##?\s/.test(x) && !/^###/.test(x); })[0];
+    return l ? l.replace(/^#+\s*/, "") : "Collectify " + r.version;
+  }
+  function paint() {
+    var q = document.getElementById("q").value.trim().toLowerCase();
+    var list = all.filter(function (r) { return !q || (r.notes || "").toLowerCase().indexOf(q) >= 0 || r.version.indexOf(q) >= 0; });
+    document.getElementById("count").textContent = list.length + " of " + all.length + " releases";
+    document.getElementById("list").innerHTML = list.map(function (r, i) {
+      var isNew = all[0] === r;
+      return '<article class="rel" id="v' + r.version + '"><header><h2>' + S.esc(title(r)) + (isNew ? '<span class="tag">latest</span>' : "") + '</h2><span class="meta">v' + r.version + " · build " + (r.versionCode || "?") + (r.date ? " · " + S.fmtDate(r.date) : "") + "</span></header>" +
+        '<div class="md">' + S.md(r.notes) + "</div>" +
+        '<div class="files"><a class="btn small primary" href="' + r.download + '">APK · ' + S.fmtSize(r.size) + "</a>" + (r.ipa ? '<a class="btn small" href="' + r.ipaDownload + '">IPA · ' + S.fmtSize(r.ipaSize) + "</a>" : "") + '<a class="btn small" href="' + r.url + '">GitHub release</a></div>' +
+        '<details><summary>Checksums</summary><p style="word-break:break-all;font:12px ui-monospace,monospace">APK SHA-256<br>' + r.sha256 + (r.ipa && r.ipaSha256 ? "<br><br>IPA SHA-256<br>" + r.ipaSha256 : "") + "</p></details></article>";
+    }).join("") || '<div class="rel"><div class="md"><p>Nothing matches that.</p></div></div>';
+    if (location.hash && !q) { var e = document.getElementById(location.hash.slice(1)); if (e) e.scrollIntoView(); }
+  }
+  S.releases().then(function (l) { all = l; paint(); document.getElementById("q").addEventListener("input", paint); })
+    .catch(function () { document.getElementById("list").innerHTML = '<div class="rel"><div class="md"><p>Couldn\'t load the changelog. See the <a href="' + S.REPO + '/releases">GitHub releases page</a>.</p></div></div>'; });
+})();
+</script>
+</body>
+</html>

@@ -182,6 +182,15 @@ public enum Match {
         return best > 0 ? best : NSNull()
     }
 
+    // What a pack can be opened into (same rule as match.py / Match.kt): a set needs minSetCards cards with
+    // pictures. Cards are numbered products; a set with too few of those may also use its unnumbered cards (rarity,
+    // not named like sealed product), which is how games such as Sorcery list theirs.
+    static let minSetCards = 8
+    private static let notSealedSQL = "p.name NOT LIKE '%Booster%' AND p.name NOT LIKE '%Display%' AND p.name NOT LIKE '%Bundle%' AND p.name NOT LIKE '%Starter%' AND p.name NOT LIKE '%Deck' AND p.name NOT LIKE '%Deck %' AND p.name NOT LIKE '%Box' AND p.name NOT LIKE '%Box %' AND p.name NOT LIKE '%Pack' AND p.name NOT LIKE '%Pack %' AND p.name NOT LIKE '%Case' AND p.name NOT LIKE '%Case %'"
+    private static let unnumberedCardSQL = "(p.rarity IS NOT NULL AND p.rarity <> 'None' AND \(notSealedSQL))"
+    static let groupCardCountSQL = "SELECT p.group_id, CASE WHEN SUM(p.number IS NOT NULL) >= \(minSetCards) THEN SUM(p.number IS NOT NULL) ELSE SUM(p.number IS NOT NULL OR \(unnumberedCardSQL)) END AS cnt FROM products p WHERE p.image_url IS NOT NULL"
+    static let poolCardSQL = "p.image_url IS NOT NULL AND (p.number IS NOT NULL OR (\(unnumberedCardSQL) AND (SELECT COUNT(*) FROM products q WHERE q.group_id = p.group_id AND q.number IS NOT NULL AND q.image_url IS NOT NULL) < \(minSetCards)))"
+
     static let packClauseSQL = "((p.name LIKE '%Booster Pack%' OR p.name LIKE '%Celebration Pack%' OR p.name LIKE '%Anniversary Pack%') AND p.name NOT LIKE '%Case%' AND p.name NOT LIKE '%Box%' AND p.name NOT LIKE '%&%' AND p.name NOT LIKE '%Promo%' AND p.name NOT LIKE '%Portfolio%' AND p.name NOT LIKE '% Pin%' AND p.name NOT LIKE '%Bundle%' AND p.name NOT LIKE '%Display%' AND p.name NOT LIKE '%Blister%' AND p.name NOT LIKE '%Code Card%')"
     private static let boxClause = "(p.name LIKE '%Booster Box%' AND p.name NOT LIKE '%Case%' AND p.name NOT LIKE '%&%' AND p.name NOT LIKE '%Promo%' AND p.name NOT LIKE '%Portfolio%' AND p.name NOT LIKE '% Pin%' AND p.name NOT LIKE '%Bundle%' AND p.name NOT LIKE '%Display%' AND p.name NOT LIKE '%Blister%' AND p.name NOT LIKE '%Code Card%')"
 
@@ -231,10 +240,10 @@ public enum Match {
         let gids = raw.compactMap { $0["group_id"] as? Int }.distinctOrdered()
         var counts = [Int: Int]()
         let ph = gids.map { _ in "?" }.joined(separator: ",")
-        for r in try db.query("SELECT group_id, COUNT(*) AS n FROM products WHERE group_id IN (\(ph)) AND number IS NOT NULL GROUP BY group_id", gids) {
-            counts[r.int("group_id")] = r.int("n")
+        for r in try db.query("\(groupCardCountSQL) AND p.group_id IN (\(ph)) GROUP BY p.group_id", gids) {
+            counts[r.int("group_id")] = r.int("cnt")
         }
-        var kept = raw.filter { (counts[$0["group_id"] as! Int] ?? 0) >= 12 }.take(limit)
+        var kept = raw.filter { (counts[$0["group_id"] as! Int] ?? 0) >= minSetCards }.take(limit)
         for i in kept.indices {
             let gid = kept[i]["group_id"] as! Int
             kept[i]["card_count"] = counts[gid] ?? 0
@@ -255,7 +264,7 @@ public enum Match {
             FROM products p
             JOIN groups g ON g.group_id = p.group_id
             JOIN categories c ON c.category_id = p.category_id
-            WHERE p.group_id = ? AND p.number IS NOT NULL AND p.image_url IS NOT NULL
+            WHERE p.group_id = ? AND \(poolCardSQL)
             ORDER BY p.product_id
             LIMIT 900
             """, [groupId])
