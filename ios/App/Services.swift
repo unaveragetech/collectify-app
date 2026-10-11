@@ -71,7 +71,7 @@ final class Services {
 
     func ensureRunning() {
         server?.ensureRunning()
-        if TradeRooms.shared.hasRooms() { roomServer?.ensureRunning() }
+        if TradeRooms.shared.hasRooms() || VisitRooms.shared.hasRooms() { roomServer?.ensureRunning() }
     }
 
     // In-person trades: the port is only open while a trade room is.
@@ -86,7 +86,7 @@ final class Services {
             guard let self = self, self.idleTimer == nil else { return }
             self.idleTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
                 guard let self = self else { return }
-                if !TradeRooms.shared.hasRooms() {
+                if !TradeRooms.shared.hasRooms() && !VisitRooms.shared.hasRooms() {
                     self.roomServer?.stop()
                     self.idleTimer?.invalidate()
                     self.idleTimer = nil

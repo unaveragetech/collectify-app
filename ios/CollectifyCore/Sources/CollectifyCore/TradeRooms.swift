@@ -273,6 +273,39 @@ public final class TradeRooms {
 public enum RoomRoutes {
     public static let port: UInt16 = 8322
 
+    /// Island visits: /visit/{token}[/join|/act|/host|/leave] (see VisitRooms).
+    private static func handleVisit(_ req: HTTPRequest, _ parts: [String]) -> HTTPResponse {
+        func json(_ code: Int, _ o: JSON) -> HTTPResponse { cors(.json(o, status: code)) }
+        let visits = VisitRooms.shared
+        let token = parts[1]
+        let body = parseJSONObject(req.body) ?? [:]
+        if parts.count == 2 && req.method == "GET" {
+            let since = req.query["v"].flatMap { Int($0) }
+            let sv = req.query["sv"].flatMap { Int($0) }
+            let waitMs = Int(((req.query["wait"].flatMap { Double($0) }) ?? 0) * 1000)
+            if let room = visits.get(token: token, since: since, sv: sv, waitMs: waitMs, me: req.query["me"]) { return json(200, room) }
+            return json(404, ["detail": "no such island visit"])
+        }
+        if parts.count == 3 && req.method == "POST" {
+            switch parts[2] {
+            case "join":
+                let (c, o) = visits.join(token: token, name: jString(body["name"]) ?? "Visitor", client: jString(body["client"]) ?? "")
+                return json(c, o)
+            case "act":
+                let (c, o) = visits.act(token: token, body: body)
+                return json(c, o)
+            case "host":
+                let (c, o) = visits.hostUpdate(token: token, body: body)
+                return json(c, o)
+            case "leave":
+                let (c, o) = visits.leave(token: token, body: body)
+                return json(c, o)
+            default: break
+            }
+        }
+        return json(404, ["detail": "not found"])
+    }
+
     private static func cors(_ r: HTTPResponse) -> HTTPResponse {
         var r = r
         r.headers["Access-Control-Allow-Origin"] = "*"
@@ -287,6 +320,7 @@ public enum RoomRoutes {
         if req.method == "OPTIONS" { return cors(HTTPResponse(status: 204, contentType: "text/plain", body: Data())) }
         let parts = req.path.trimmingCharacters(in: CharacterSet(charactersIn: "/")).split(separator: "/", omittingEmptySubsequences: false).map(String.init)
         func json(_ code: Int, _ o: JSON) -> HTTPResponse { cors(.json(o, status: code)) }
+        if parts.count >= 2 && parts[0] == "visit" { return handleVisit(req, parts) }
         if parts.count < 2 || parts[0] != "room" { return json(404, ["detail": "not found"]) }
         let token = parts[1]
         let body = parseJSONObject(req.body) ?? [:]

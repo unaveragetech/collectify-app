@@ -51,6 +51,7 @@ public final class APIServer {
         if uri.hasPrefix("/static/") && !uri.contains("..") { return serveAsset(String(uri.dropFirst("/static/".count))) }
 
         if uri == "/api/room/open" && m == "POST" { return try roomOpen(req) }
+        if uri == "/api/visit/open" && m == "POST" { return try visitOpen(req) }
         if uri == "/api/game/state" && m == "GET" { return try stateGet("game_state") }
         if uri == "/api/game/state" && m == "PUT" { return try statePut(req, "game_state", 8_000_000, "game state too large") }
         if uri == "/api/island/state" && m == "GET" { return try stateGet("island_state") }
@@ -281,6 +282,20 @@ public final class APIServer {
         if client.isEmpty { throw BadRequest("client id required") }
         onRoomOpen?()
         let token = TradeRooms.shared.open(hostName: jString(b["name"]) ?? "Collector", client: client)
+        return ok([
+            "token": token,
+            "ips": TradeRooms.lanAddresses(),
+            "port": Int(RoomRoutes.port),
+            "local_base": "http://127.0.0.1:\(RoomRoutes.port)",
+        ])
+    }
+
+    private func visitOpen(_ req: HTTPRequest) throws -> HTTPResponse {
+        let b = body(req)
+        let client = jString(b["client"]) ?? ""
+        if client.isEmpty { throw BadRequest("client id required") }
+        onRoomOpen?()
+        let token = VisitRooms.shared.open(hostName: jString(b["name"]) ?? "Islander", client: client)
         return ok([
             "token": token,
             "ips": TradeRooms.lanAddresses(),
