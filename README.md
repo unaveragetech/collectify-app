@@ -1,4 +1,7 @@
-# Collectify (Android and iPhone)
+# Collectify (Android and iPhone)
+
+> **⏸ The iPhone version is paused until further notice and won't be updated.** The last iPhone build is 0.31.0. Everything after 0.31.0 (the shop's new decor and upkeep, update notices and more) is Android only for now.
+
 
 **Website:** https://unaveragetech.github.io/collectify-app/ - [features](https://unaveragetech.github.io/collectify-app/features.html), [step-by-step install guides for Android and iPhone](https://unaveragetech.github.io/collectify-app/install.html) (with troubleshooting), the [changelog](https://unaveragetech.github.io/collectify-app/changelog.html) and the SHA-256 of every release. In the app, ℹ️ → *Check for updates* compares your install with that list.
 

@@ -19,10 +19,10 @@
       <p class="lead">Collectify tracks what you own, what it's worth and what you still want across <b class="n-games">54</b> trading card games. Scan cards with your camera, keep them in binders, trade face to face, and play a mining game that hands out booster packs from every set.</p>
       <div class="btns">
         <a class="btn primary" id="dl-apk" href="install.html#android">⬇ Android (.apk)</a>
-        <a class="btn" id="dl-ios" href="install.html#iphone">⬇ iPhone (.ipa)</a>
+        <a class="btn" id="dl-ios" href="install.html#iphone">⏸ iPhone: paused</a>
         <a class="btn" href="features.html">See what it does</a>
       </div>
-      <small id="hero-sub">Android 8.0+ and iOS 15+ · sideload (not in the app stores) · updates keep your data</small>
+      <small id="hero-sub">Android 8.0+ · sideload (not in the app stores) · updates keep your data · iPhone is paused</small>
     </div>
     <div class="phone" id="phone"><div class="ph-empty">♠</div></div>
   </div>
@@ -53,7 +53,7 @@
 
   <section>
     <div class="grid two">
-      <div class="callout"><h3>The same app on both phones</h3><p>Every release has an Android <code>.apk</code> and an iPhone <code>.ipa</code>, built from the same web interface. The iPhone's on-device server is a Swift port of the Android one, tested against answers recorded from it.</p></div>
+      <div class="callout warn"><h3>The iPhone version is paused</h3><p>⏸ The iPhone version is paused until further notice and won't be updated. The last iPhone build (0.31.0) stays available and keeps working, but new versions are only being made for Android for now. Everything after 0.31.0 is Android only.</p></div>
       <div class="callout blue"><h3>Private by design</h3><p>Your collection lives in a database on your phone. No accounts, no ads, no tracking. The only network use is prices, card pictures and the update check, when you ask for them.</p><p><a href="about.html#privacy">Privacy details →</a></p></div>
     </div>
   </section>
@@ -64,7 +64,7 @@
     <p class="lead">Collectify isn't in the Play Store or App Store yet, so you install the file yourself. The install page walks through every step and what to do if something goes wrong.</p>
     <div class="grid two">
       <a class="card" href="install.html#android"><h3>🤖 Android</h3><p>Download the .apk, allow installs from your browser, tap it. Android 8.0 or newer. Updates install over the old version and keep your data.</p></a>
-      <a class="card" href="install.html#iphone"><h3>📱 iPhone and iPad</h3><p>Install the .ipa with AltStore, Sideloadly or TrollStore. A free Apple ID works; the app then needs a refresh once a week. iOS 15 or newer.</p></a>
+      <a class="card" href="install.html#iphone"><h3>📱 iPhone and iPad (paused)</h3><p>No new iPhone builds until further notice. The last one (0.31.0) can still be installed with AltStore, Sideloadly or TrollStore, but it will not be updated.</p></a>
     </div>
   </section>
 
@@ -85,11 +85,11 @@
     var r = list[0]; if (!r) return;
     var a = document.getElementById("dl-apk"), i = document.getElementById("dl-ios");
     a.href = r.download; a.textContent = "⬇ Android v" + r.version + " (" + S.fmtSize(r.size) + ")";
-    if (r.ipa) { i.href = r.ipaDownload; i.textContent = "⬇ iPhone v" + r.version + " (" + S.fmtSize(r.ipaSize) + ")"; }
-    document.getElementById("hero-sub").textContent = "Latest: v" + r.version + (r.date ? " · " + S.fmtDate(r.date) : "") + " · Android 8.0+ and iOS 15+ · sideload (not in the app stores) · updates keep your data";
+    i.textContent = "⏸ iPhone: paused (last build 0.31.0)";
+    document.getElementById("hero-sub").textContent = "Latest: v" + r.version + (r.date ? " · " + S.fmtDate(r.date) : "") + " · Android 8.0+ · sideload (not in the app stores) · updates keep your data · iPhone is paused";
     var first = (r.notes || "").split(/\r?\n/).filter(function (l) { return /^##?\s/.test(l); })[0];
     document.getElementById("rel-title").textContent = first ? first.replace(/^#+\s*/, "") : "v" + r.version;
-    document.getElementById("rel-box").innerHTML = '<div class="md">' + S.md(r.notes) + '</div><div class="files"><a class="btn small primary" href="' + r.download + '">APK</a>' + (r.ipa ? '<a class="btn small" href="' + r.ipaDownload + '">IPA</a>' : "") + '<a class="btn small" href="' + r.url + '">Release page</a></div>';
+    document.getElementById("rel-box").innerHTML = '<div class="md">' + S.md(r.notes) + '</div><div class="files"><a class="btn small primary" href="' + r.download + '">APK</a>' + '<a class="btn small" href="' + r.url + '">Release page</a></div>';
   }).catch(function () { document.getElementById("hero-sub").textContent = "Couldn't load release data; see the install page."; });
   fetch("stats.json").then(function (r) { return r.json(); }).then(function (s) {
     document.querySelectorAll(".n-games").forEach(function (e) { e.textContent = s.games; });
