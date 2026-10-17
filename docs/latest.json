@@ -1,15 +1,15 @@
 {
-  "version": "0.30.0",
-  "versionCode": 45,
-  "tag": "v0.30.0-standalone",
-  "date": "2026-10-12T05:59:19Z",
-  "apk": "Collectify-v0.30.0.apk",
-  "size": 106775491,
-  "sha256": "701c7dd10019af26d373cf7c67bcf3ccfeb7a176066423510c8d8e47b9b2bd15",
-  "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.30.0-standalone",
-  "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.30.0-standalone/Collectify-v0.30.0.apk",
-  "ipa": "Collectify-v0.30.0.ipa",
-  "ipaSize": 97751090,
-  "ipaSha256": "9996be4abf6e43d58e7eb3797e203a4203d64fca57b1fad9feb51e7bf227838f",
-  "ipaDownload": "https://github.com/unaveragetech/collectify-app/releases/download/v0.30.0-standalone/Collectify-v0.30.0.ipa"
+  "version": "0.31.0",
+  "versionCode": 46,
+  "tag": "v0.31.0-standalone",
+  "date": "2026-10-17T18:44:20Z",
+  "apk": "Collectify-v0.31.0.apk",
+  "size": 107015375,
+  "sha256": "f5f55cb9cc5c3ad1e5f7033988ea040c011013280d048d986272e25dea5b7a67",
+  "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.31.0-standalone",
+  "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.31.0-standalone/Collectify-v0.31.0.apk",
+  "ipa": "Collectify-v0.31.0.ipa",
+  "ipaSize": 97999745,
+  "ipaSha256": "216a65e43c724a04153548bedf8f39d81dd0efaa8bff58ccbf6fb29cef050388",
+  "ipaDownload": "https://github.com/unaveragetech/collectify-app/releases/download/v0.31.0-standalone/Collectify-v0.31.0.ipa"
 }
