@@ -113,7 +113,8 @@ public enum CatalogDB {
                 match_confidence  REAL,
                 acquired_at       TEXT NOT NULL,
                 grade             REAL,
-                grade_data        TEXT
+                grade_data        TEXT,
+                tags              TEXT
             )
             """)
         try db.exec("CREATE INDEX IF NOT EXISTS idx_collection_product ON collection_items(product_id)")
@@ -129,6 +130,7 @@ public enum CatalogDB {
             """)
         try db.exec("CREATE INDEX IF NOT EXISTS idx_wishlist_product ON wishlist_items(product_id)")
         try createTradesTable(db)
+        try createAppliedOpsTable(db)
         try db.exec("INSERT OR IGNORE INTO binders(id, name, category_id, page_size, sort_order, created_at) VALUES('default', 'My Binder', NULL, 9, 0, ?)", [utcNow()])
     }
 
@@ -146,7 +148,9 @@ public enum CatalogDB {
         try ensureColumn(db, "rules_text")
         try ensureColumn(db, "grade", "REAL", table: "collection_items")
         try ensureColumn(db, "grade_data", "TEXT", table: "collection_items")
+        try ensureColumn(db, "tags", "TEXT", table: "collection_items")
         try createTradesTable(db)
+        try createAppliedOpsTable(db)
         try ensureBinderLayoutV2(db)
         try db.exec("CREATE INDEX IF NOT EXISTS idx_products_clean_name ON products(clean_name)")
         reconciled.insert(db.path)
@@ -244,6 +248,11 @@ public enum CatalogDB {
 
     // ---------------------------------------------------------------- idempotent migrations
 
+    /// Operations applied to the collection as one all-or-nothing step; the key makes a retry safe.
+    static func createAppliedOpsTable(_ db: SQLiteDB) throws {
+        try db.exec("CREATE TABLE IF NOT EXISTS applied_ops (key TEXT PRIMARY KEY, result TEXT NOT NULL, applied_at TEXT NOT NULL)")
+    }
+
     static func createTradesTable(_ db: SQLiteDB) throws {
         try db.exec("""
             CREATE TABLE IF NOT EXISTS trades (
@@ -317,6 +326,38 @@ public enum CatalogDB {
         }
     }
 
+    /// A catalog merge replaces the catalog tables wholesale. A card in a binder (or on the wishlist) whose product
+    /// is not in the new catalog would silently vanish from its page, so first remember those rows, then after the
+    /// merge point them at the same card in the new catalog (same game, number and name), and for any that have no
+    /// match keep the old product row so the card stays visible. Mirrored in Db.kt.
+    static let legacyKeepSQL: [String] = [
+        "DROP TABLE IF EXISTS temp.keep_products",
+        "DROP TABLE IF EXISTS temp.keep_groups",
+        "DROP TABLE IF EXISTS temp.keep_categories",
+        "DROP TABLE IF EXISTS temp.keep_prices",
+        "CREATE TEMP TABLE keep_products AS SELECT p.* FROM main.products p WHERE p.product_id IN (SELECT product_id FROM main.collection_items UNION SELECT product_id FROM main.wishlist_items)",
+        "CREATE TEMP TABLE keep_groups AS SELECT g.* FROM main.groups g WHERE g.group_id IN (SELECT group_id FROM temp.keep_products)",
+        "CREATE TEMP TABLE keep_categories AS SELECT c.* FROM main.categories c WHERE c.category_id IN (SELECT category_id FROM temp.keep_products)",
+        "CREATE TEMP TABLE keep_prices AS SELECT pr.* FROM main.prices pr WHERE pr.product_id IN (SELECT product_id FROM temp.keep_products) AND pr.price_date = (SELECT MAX(q.price_date) FROM main.prices q WHERE q.product_id = pr.product_id AND q.sub_type_name = pr.sub_type_name)",
+    ]
+    private static func repoint(_ table: String) -> String {
+        "(SELECT n.product_id FROM temp.keep_products k JOIN main.products n ON n.category_id = k.category_id AND n.name = k.name AND n.number IS k.number WHERE k.product_id = \(table).product_id ORDER BY n.product_id LIMIT 1)"
+    }
+    static var legacyRestoreSQL: [String] {
+        [
+            "UPDATE main.collection_items SET product_id = \(repoint("collection_items")) WHERE product_id NOT IN (SELECT product_id FROM main.products) AND \(repoint("collection_items")) IS NOT NULL",
+            "UPDATE main.wishlist_items SET product_id = \(repoint("wishlist_items")) WHERE product_id NOT IN (SELECT product_id FROM main.products) AND \(repoint("wishlist_items")) IS NOT NULL",
+            "INSERT OR IGNORE INTO main.categories SELECT * FROM temp.keep_categories",
+            "INSERT OR IGNORE INTO main.groups SELECT * FROM temp.keep_groups",
+            "INSERT OR IGNORE INTO main.products SELECT * FROM temp.keep_products WHERE product_id IN (SELECT product_id FROM main.collection_items UNION SELECT product_id FROM main.wishlist_items)",
+            "INSERT OR IGNORE INTO main.prices SELECT * FROM temp.keep_prices WHERE product_id IN (SELECT product_id FROM temp.keep_products) AND product_id NOT IN (SELECT product_id FROM main.prices)",
+            "DROP TABLE IF EXISTS temp.keep_products",
+            "DROP TABLE IF EXISTS temp.keep_groups",
+            "DROP TABLE IF EXISTS temp.keep_categories",
+            "DROP TABLE IF EXISTS temp.keep_prices",
+        ]
+    }
+
     /// An app update only brings a newer catalog if `catalog_version.txt` is higher than what the
     /// device recorded: then the catalog tables (never binders/collection/wishlist) are replaced.
     public static func mergeCatalogUpdateIfNeeded(db: SQLiteDB, bundled: URL?, versionFile: URL?, onStart: (() -> Void)? = nil) {
@@ -340,10 +381,13 @@ public enum CatalogDB {
                 // briefly gone between each DELETE and the INSERT of the same table.
                 try db.exec("PRAGMA foreign_keys=OFF")
                 try db.transaction {
+                    // cards already in binders / the wishlist must survive a catalog that no longer lists them
+                    for sql in legacyKeepSQL { try db.exec(sql) }
                     for table in ["categories", "groups", "products", "prices"] {
                         try db.exec("DELETE FROM main.\(table)")
                         try db.exec("INSERT INTO main.\(table) SELECT * FROM bundled.\(table)")
                     }
+                    for sql in legacyRestoreSQL { try db.exec(sql) }
                     try db.setMeta("catalog_version", bundledVersion)
                 }
                 try db.exec("PRAGMA foreign_keys=ON")

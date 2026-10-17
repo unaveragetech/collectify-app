@@ -339,6 +339,57 @@ public enum Match {
             """, [productId, productId]).map(priceRowJSON)
     }
 
+    // ---- other pictures of the same card (mirrors match.image_alternates in Python) ----
+
+    static func altBaseName(_ name: String?) -> String {
+        var out = ""
+        var depth = 0
+        for ch in (name ?? "") {
+            if ch == "(" || ch == "[" { depth += 1; continue }
+            if (ch == ")" || ch == "]") && depth > 0 { depth -= 1; continue }
+            if depth == 0 { out.append(ch) }
+        }
+        if let r = out.range(of: " - ") { out = String(out[..<r.lowerBound]) }
+        return out.split(whereSeparator: { $0 == " " || $0 == "\t" || $0 == "\n" }).joined(separator: " ").lowercased()
+    }
+
+    static func altNormNumber(_ number: String?) -> String {
+        var out = ""
+        var run = ""
+        for ch in (number ?? "").lowercased().trimmingCharacters(in: .whitespacesAndNewlines) {
+            if ch.isASCII && ch.isNumber {
+                run.append(ch)
+            } else {
+                if !run.isEmpty { let t = run.drop(while: { $0 == "0" }); out += t.isEmpty ? "0" : String(t); run = "" }
+                out.append(ch)
+            }
+        }
+        if !run.isEmpty { let t = run.drop(while: { $0 == "0" }); out += t.isEmpty ? "0" : String(t) }
+        return out
+    }
+
+    public static func imageAlternates(_ db: SQLiteDB, productId: Int, limit: Int = 6) throws -> [JSON] {
+        guard let p = try db.query("SELECT name, number, category_id, group_id FROM products WHERE product_id=?", [productId]).first,
+              let number = p.stringOrNil("number"), !number.isEmpty else { return [] }
+        let base = altBaseName(p.string("name"))
+        let num = altNormNumber(number)
+        if base.isEmpty { return [] }
+        let like = base.replacingOccurrences(of: "%", with: "").replacingOccurrences(of: "_", with: "") + "%"
+        let rows = try db.query(
+            "SELECT product_id, name, number, group_id, image_url FROM products WHERE category_id=? AND product_id<>? AND number IS NOT NULL AND image_url IS NOT NULL AND name LIKE ? LIMIT 1500",
+            [p.int("category_id"), productId, like])
+        var found = [(variant: Int, other: Int, id: Int, obj: JSON)]()
+        for r in rows {
+            let rn = r.string("name")
+            if altNormNumber(r.stringOrNil("number")) != num || altBaseName(rn) != base { continue }
+            let variant = (rn.contains("(") || rn.contains("[")) ? 1 : 0
+            let obj: JSON = ["product_id": r.int("product_id"), "name": rn, "number": orNull(r.stringOrNil("number")), "group_id": r.int("group_id"), "image_url": orNull(r.stringOrNil("image_url"))]
+            found.append((variant, r.int("group_id") == p.int("group_id") ? 0 : 1, r.int("product_id"), obj))
+        }
+        found.sort { ($0.variant, $0.other, $0.id) < ($1.variant, $1.other, $1.id) }
+        return found.prefix(limit).map { $0.obj }
+    }
+
     public static func defaultSubType(_ prices: [JSON]) -> String {
         for p in prices where (p["sub_type_name"] as? String) == "Normal" { return "Normal" }
         return (prices.first?["sub_type_name"] as? String) ?? "Normal"

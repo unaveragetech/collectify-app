@@ -24,6 +24,8 @@ public final class APIServer {
             return try route(req)
         } catch let e as BadRequest {
             return .detail(e.message, status: 400)
+        } catch let e as ConflictError {
+            return .detail(e.message, status: 409)
         } catch let e as SQLError {
             return .detail(e.message, status: 500)
         } catch {
@@ -54,6 +56,9 @@ public final class APIServer {
         if uri == "/api/visit/open" && m == "POST" { return try visitOpen(req) }
         if uri == "/api/game/state" && m == "GET" { return try stateGet("game_state") }
         if uri == "/api/game/state" && m == "PUT" { return try statePut(req, "game_state", 8_000_000, "game state too large") }
+        if uri == "/api/img" { return imgProxy(q["u"]) }
+        if uri == "/api/shop/state" && m == "GET" { return try stateGet("shop_state") }
+        if uri == "/api/shop/state" && m == "PUT" { return try statePut(req, "shop_state", 1_000_000, "shop state too large") }
         if uri == "/api/island/state" && m == "GET" { return try stateGet("island_state") }
         if uri == "/api/island/state" && m == "PUT" { return try statePut(req, "island_state", 1_000_000, "island state too large") }
         if uri == "/api/game/sealed" {
@@ -86,11 +91,26 @@ public final class APIServer {
         if uri == "/api/trades" && m == "POST" { return try recordTrade(req) }
         if uri == "/api/categories" { return ok(try listCategories(q["search"])) }
         if uri == "/api/search" { return try search(q) }
+        if uri.hasPrefix("/api/product/") && uri.hasSuffix("/alt") {
+            guard let pid = Int(uri.dropFirst("/api/product/".count).dropLast("/alt".count)) else { throw BadRequest("bad product id") }
+            return ok(try Match.imageAlternates(db, productId: pid))
+        }
         if uri.hasPrefix("/api/product/") { return try product(String(uri.dropFirst("/api/product/".count))) }
         if uri == "/api/binders" && m == "GET" { return ok(try CollectionRepo(db).listBinders()) }
         if uri == "/api/binders" && m == "POST" { return try createBinder(req) }
         if uri == "/api/collection" && m == "GET" { return try getCollection(q) }
         if uri == "/api/collection" && m == "POST" { return try addCollection(req) }
+        if uri == "/api/collection/tags" && m == "PUT" {
+            let b = body(req)
+            let changed = try CollectionOps(db).updateTags(ids: Tags.strings(b["ids"]), add: Tags.strings(b["add"]), remove: Tags.strings(b["remove"]), set: b.has("set") ? Tags.strings(b["set"]) : nil)
+            return ok(["ok": true, "changed": changed])
+        }
+        if uri == "/api/collection/apply" && m == "POST" {
+            let b = body(req)
+            let adds = ((b["add"] as? [Any]) ?? []).compactMap { $0 as? JSON }
+            let removes = ((b["remove"] as? [Any]) ?? []).compactMap { $0 as? JSON }
+            return ok(try CollectionOps(db).apply(key: jString(b["key"]) ?? "", add: adds, remove: removes))
+        }
         if uri == "/api/collection/slots" && m == "PUT" {
             let moves = (body(req)["moves"] as? [Any])?.compactMap { $0 as? JSON } ?? []
             let moved = try CollectionRepo(db).moveItems(moves)
@@ -258,6 +278,32 @@ public final class APIServer {
         guard let raw = try db.getMeta(key), let data = raw.data(using: .utf8),
               let obj = try? JSONSerialization.jsonObject(with: data, options: [.fragmentsAllowed]) else { return ok(["state": NSNull()]) }
         return ok(["state": obj])
+    }
+
+    /// Same-origin proxy for card pictures (like /api/img in webapp.py): the image host sends no CORS headers, so
+    /// a page can show them but WebGL can't use them as textures. Only the card-image host is allowed; cached on disk.
+    private func imgProxy(_ u: String?) -> HTTPResponse {
+        guard let u = u, let url = URL(string: u), url.scheme == "https", url.host == "tcgplayer-cdn.tcgplayer.com" else { return .detail("image host not allowed", status: 400) }
+        let dir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("img", isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        var h: UInt64 = 5381
+        for b in u.utf8 { h = (h &* 33) &+ UInt64(b) }
+        let file = dir.appendingPathComponent(String(h, radix: 16) + ".jpg")
+        let headers = ["Cache-Control": "public, max-age=604800"]
+        if let d = try? Data(contentsOf: file) { return HTTPResponse(status: 200, contentType: "image/jpeg", body: d, headers: headers) }
+        var out: Data? = nil
+        let sem = DispatchSemaphore(value: 0)
+        var rq = URLRequest(url: url)
+        rq.timeoutInterval = 15
+        rq.setValue("Collectify/1.0", forHTTPHeaderField: "User-Agent")
+        URLSession.shared.dataTask(with: rq) { data, resp, _ in
+            if let r = resp as? HTTPURLResponse, r.statusCode == 200 { out = data }
+            sem.signal()
+        }.resume()
+        _ = sem.wait(timeout: .now() + 20)
+        guard let d = out, !d.isEmpty else { return .detail("image unavailable", status: 404) }
+        try? d.write(to: file)
+        return HTTPResponse(status: 200, contentType: "image/jpeg", body: d, headers: headers)
     }
 
     private func statePut(_ req: HTTPRequest, _ key: String, _ max: Int, _ tooLarge: String) throws -> HTTPResponse {

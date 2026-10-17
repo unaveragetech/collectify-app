@@ -511,6 +511,62 @@ final class UserFlowTests: XCTestCase {
         XCTAssertFalse(started)
     }
 
+    func testMergeKeepsLegacyCards() throws {
+        // a card whose product the new catalog dropped, and one that was re-keyed under a new id
+        try db.exec("INSERT INTO products(product_id, group_id, category_id, name, clean_name, image_url, number, rarity) VALUES(7777,100,3,'Retired Card','Retired Card','https://img/7777.jpg','1/1','Rare')")
+        try db.exec("INSERT INTO prices(product_id, sub_type_name, price_date, market_price, captured_at) VALUES(7777,'Normal','2026-02-01',9.0,'2026-02-01T00:00:00Z')")
+        call("POST", "/api/collection", ["product_id": 7777])
+        call("POST", "/api/collection", ["product_id": 1001])
+        let bundled = dir.appendingPathComponent("bundled.db")
+        let b = try SQLiteDB(path: bundled.path)
+        for sql in try db.query("SELECT sql FROM sqlite_master WHERE type='table' AND name IN ('categories','groups','products','prices','meta')").map({ $0.string("sql") }) { try b.exec(sql) }
+        try b.exec("INSERT INTO categories(category_id, name, display_name) VALUES(3,'Pokemon','Pokemon')")
+        try b.exec("INSERT INTO groups(group_id, category_id, name) VALUES(100,3,'Base Set')")
+        try b.exec("INSERT INTO products(product_id, group_id, category_id, name, clean_name, number) VALUES(9001,100,3,'Pikachu','Pikachu','58/102')")
+        let vf = dir.appendingPathComponent("catalog_version.txt")
+        try "13".write(to: vf, atomically: true, encoding: .utf8)
+        CatalogDB.mergeCatalogUpdateIfNeeded(db: db, bundled: bundled, versionFile: vf)
+        let (_, r) = call("GET", "/api/collection")
+        let items = arr(dict(r)["items"]!)
+        XCTAssertEqual(items.count, 2, "both cards still show up")
+        XCTAssertNotNil(items.first { ($0["product_id"] as? Int) == 9001 }, "the re-keyed card points at its new product")
+        XCTAssertNotNil(items.first { ($0["product_id"] as? Int) == 7777 && ($0["name"] as? String) == "Retired Card" }, "the dropped card keeps its old product")
+    }
+
+    func testTagsAndAtomicApply() throws {
+        var (c, r) = call("POST", "/api/collection", ["product_id": 1001, "quantity": 2])
+        let a = dict(r)["id"] as! String
+        (c, r) = call("POST", "/api/collection", ["product_id": 1002, "sub_type_name": "Holofoil"])
+        let b2 = dict(r)["id"] as! String
+        // tags
+        (c, r) = call("PUT", "/api/collection/tags", ["ids": [a, b2], "add": ["Tradable", "High Value", "bad!"]])
+        XCTAssertEqual(c, 200)
+        XCTAssertEqual(dict(r)["changed"] as? Int, 2)
+        (c, r) = call("PUT", "/api/collection/tags", ["ids": [a], "remove": ["tradable"]])
+        XCTAssertEqual(dict(r)["changed"] as? Int, 1)
+        (c, r) = call("GET", "/api/collection")
+        let items = arr(dict(r)["items"]!)
+        XCTAssertEqual(items.first { ($0["id"] as? String) == a }?["tags"] as? [String], ["high_value"])
+        XCTAssertEqual(items.first { ($0["id"] as? String) == b2 }?["tags"] as? [String], ["tradable", "high_value"])
+        // apply: add + remove together, then the same key again does nothing more
+        let body: JSON = ["key": "k1", "add": [["product_id": 1300, "source": "trade", "tags": ["tradable"]]], "remove": [["id": a, "quantity": 1, "product_id": 1001]]]
+        (c, r) = call("POST", "/api/collection/apply", body)
+        XCTAssertEqual(c, 200)
+        XCTAssertEqual((dict(r)["added"] as? [String])?.count, 1)
+        XCTAssertEqual(dict(r)["replay"] as? Bool, false)
+        (c, r) = call("POST", "/api/collection/apply", body)
+        XCTAssertEqual(dict(r)["replay"] as? Bool, true)
+        XCTAssertEqual(try db.scalarInt("SELECT COALESCE(SUM(quantity),0) FROM collection_items"), 3) // 2 + 1 - 1 + 1
+        // all or nothing: one bad removal undoes the add that came with it
+        let before = try db.scalarInt("SELECT COALESCE(SUM(quantity),0) FROM collection_items")
+        (c, r) = call("POST", "/api/collection/apply", ["key": "k2", "add": [["product_id": 1301]], "remove": [["id": "ghost"]]])
+        XCTAssertEqual(c, 409)
+        XCTAssertEqual(try db.scalarInt("SELECT COALESCE(SUM(quantity),0) FROM collection_items"), before)
+        (c, r) = call("POST", "/api/collection/apply", ["key": "k3", "remove": [["id": b2, "grade": 8.0]]])
+        XCTAssertEqual(c, 409) // it was never graded, so it is not the card the caller expected
+        XCTAssertEqual(try db.scalarInt("SELECT COALESCE(SUM(quantity),0) FROM collection_items"), before)
+    }
+
     func testReopenExistingDatabase() throws {
         call("POST", "/api/collection", ["product_id": 1001])
         let path = db.path

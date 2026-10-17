@@ -231,7 +231,7 @@ public final class CollectionRepo {
         let whereSql = wh.isEmpty ? "" : "WHERE " + wh.joined(separator: " AND ")
         let rs = try db.query("""
             SELECT ci.id, ci.binder_id, ci.slot, ci.product_id, ci.sub_type_name, ci.condition, ci.quantity,
-                   ci.source, ci.acquired_at, ci.grade, ci.grade_data,
+                   ci.source, ci.acquired_at, ci.grade, ci.grade_data, ci.tags,
                    p.name, p.number, p.rarity, p.image_url, p.group_id, p.category_id,
                    g.name AS group_name, c.display_name AS category_name,
                    (SELECT market_price FROM prices
@@ -262,6 +262,7 @@ public final class CollectionRepo {
                 "acquired_at": r.string("acquired_at"),
                 "grade": orNull(r.doubleOrNil("grade")),
                 "grade_data": orNull(r.stringOrNil("grade_data")),
+                "tags": Tags.split(r.stringOrNil("tags")),
                 "name": r.string("name"),
                 "number": orNull(r.stringOrNil("number")),
                 "rarity": orNull(r.stringOrNil("rarity")),
