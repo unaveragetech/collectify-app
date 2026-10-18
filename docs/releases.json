@@ -3,6 +3,18 @@
   "site": "https://unaveragetech.github.io/collectify-app/",
   "releases": [
     {
+      "version": "0.32.1",
+      "versionCode": 48,
+      "tag": "v0.32.1-standalone",
+      "date": "2026-10-18T00:18:14Z",
+      "apk": "Collectify-v0.32.1.apk",
+      "size": 107081301,
+      "sha256": "a61e02ae2fdbce8f31248e18c2330a715e2116ab053ee034e2f25c51324f6a5a",
+      "url": "https://github.com/unaveragetech/collectify-app/releases/tag/v0.32.1-standalone",
+      "download": "https://github.com/unaveragetech/collectify-app/releases/download/v0.32.1-standalone/Collectify-v0.32.1.apk",
+      "notes": "## Collectify 0.32.1: selling fixes, and shop displays are easier to tap and change\n\nAndroid `.apk` only (the iPhone version is paused until further notice).\n\n### 🐞 Fixed: cards that were paid for but never left the binder\n- **Shop sales:** when two customers paid in the same instant, the second card's removal was mistaken for a repeat of the first and skipped. You were paid, the card stayed in the binder, and it could be put on a shelf and sold again after reopening the app. Every sale now has its own removal, and the same goes for thefts, whole binder lots and contract hand-overs.\n- **Sell extra copies (Earn coins):**\n  - Copies that were on a shelf or held for a trade were skipped but still paid for. Now they stay put and are never counted.\n  - You are only paid after the app reads your binders back and confirms the cards really left, and a double tap can't sell the same cards twice.\n- **Other double taps:** rescuing cards from the dupes bin, handing over a contract, accepting a buy-in offer, filling shelves automatically and opening the daily chest each ignore a second tap while the first is still being saved.\n- **\"Stock\" on a new display:** the Stock button and the \"next empty spot\" step said every spot was full on a freshly built display. Fixed.\n- The dupes bin recycling now saves right away too.\n\n### 👆 Displays are easier to tap and change\n- **Tap a display once** and a small bar appears with what you do most: **Stock**, **Fill**, **Best prices**, **Repair**, **Style**, **Edit**, **Move**. No more hunting through a big menu for the common jobs.\n- **Bigger tap targets:** each spot is larger, and a tap that lands just beside a display still picks it (the nearest one within a fingertip).\n- Tapping the floor closes the bar. While you are walking the shop, taps on the floor still walk you there.\n\n### Tested\n- 177 automated JavaScript tests and 20 Python tests pass, including new ones for the settlement keys, the first-empty-spot rule, locked duplicates and \"paid only for what left the binder\".\n- Tried in a browser at phone size. Not tried on a real phone.\n"
+    },
+    {
       "version": "0.32.0",
       "versionCode": 47,
       "tag": "v0.32.0-standalone",
